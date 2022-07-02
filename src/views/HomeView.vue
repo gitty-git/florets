@@ -1,7 +1,7 @@
 <template>
     <!-- Баннер -->
     <div class="w-full shadow-md shadow-gray-200">
-        <div class="bg-gradient-to-t from-gray-100 w-full left-0">
+        <div class="bg-gradient-to-t sm:mt-0 from-gray-100 w-full left-0">
             <div class="m-0 m-auto max-w-screen-xl flex h-full sm:p-0 py-20 relative overflow-hidden">
                 <div class="lg:p-0 sm:px-0 px-6 flex justify-center z-10 w-full lg:w-1/2 flex-col pr-24">
                     <div class="font-display lg:-ml-1.5 leading-snug text-3xl sm:text-5xl">Быстрая доставка букетов</div>

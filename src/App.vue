@@ -1,6 +1,6 @@
 <template>
     <div>
-        <nav class="uppercase w-full shadow shadow-gray-150">
+        <nav class="uppercase fixed top-0 bg-white z-30 w-full shadow shadow-gray-150">
             <div class="max-w-screen-xl m-0 m-auto lg:p-0 sm:px-0 px-6 items-center h-28 flex justify-between">
                 <router-link :to="{ name: 'home' }">
                     <img class="w-20" :src="require(`@/assets/svg/logo.svg`)" alt="">
@@ -19,21 +19,19 @@
                     <router-link to="#">Корзина (0 ₽)</router-link>
                 </div>
 
-                <div v-on:click="handleClick()" class="lg:absolute flex visible lg:invisible static lg:absolute">
+                <div v-show="!isClicked" @click="handeClick" class="lg:absolute p-4 -mr-4 flex visible lg:invisible static lg:absolute">
                     <svg width="24" height="24" viewBox="0 0 19 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                         <line x1="-2.91409e-08" y1="0.75" x2="19" y2="0.749999" stroke="black" stroke-width="0.5"/>
                         <line x1="-2.91409e-08" y1="6.75" x2="19" y2="6.75" stroke="black" stroke-width="0.5"/>
                         <line x1="-2.18557e-08" y1="12.75" x2="19" y2="12.75" stroke="black" stroke-width="0.5"/>
                     </svg>
                 </div>
-
-                <div class="absolute w-full top-0 right-0 flex justify-center py-24 z-50">
-                    <div>О нас</div>
-                </div>
             </div>
         </nav>
 
-        <router-view/>
+        <div class="mt-28">
+            <router-view/>
+        </div>
 
         <!-- Footer -->
         <div class="px-6">
@@ -132,20 +130,46 @@
 
         <!-- All Rights -->
         <div class="flex justify-center mb-16 text-gray-400 text-sm">© 2022 Florets, все права защищены.</div>
+
+        <!-- mobile menu -->
+        <transition
+                enter-active-class="duration-300 ease-out"
+                enter-from-class="transform opacity-0"
+                enter-to-class="opacity-100"
+                leave-active-class="duration-200 ease-in"
+                leave-from-class="opacity-100"
+                leave-to-class="transform opacity-0"
+        >
+        <div v-show="isClicked" class="blurred shadow-md fixed w-full py-24 top-0 right-0 text-2xl flex flex-col items-center">
+            <div class="mb-12 p-4"  @click="isClicked = !isClicked">&#9587;</div>
+            <div @click.stop="isClicked = !isClicked" class="mb-12" >
+                <a href="#bouquets">Букеты</a>
+            </div>
+            <div @click.stop="isClicked = !isClicked" class="" >
+                <a href="#about">О нас</a>
+            </div>
+        </div>
+        </Transition>
+        <div v-show="isClicked" @click="isClicked = !isClicked" class="bg-black opacity-0 fixed top-0 bottom-0 z-30 h-full w-screen"></div>
     </div>
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref } from "vue";
+// let isClicked = false
+const isClicked = ref(false)
 
-const isMenuClicked = ref(false)
-
-const handleClick = () => {
-    isMenuClicked.value = !isMenuClicked.value
-    console.log('isMenuClicked.value')
+const handeClick = () => {
+    isClicked.value = !isClicked.value
+    console.log(isClicked.value)
 }
 </script>
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Noto+Serif+Display:wght@400;700&display=swap');
+.blurred {
+    background: rgb(255, 255, 255, 0.6);
+    backdrop-filter: blur(12px);
+    z-index: 50;
+}
 </style>
