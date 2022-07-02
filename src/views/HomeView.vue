@@ -1,12 +1,12 @@
 <template>
     <!-- Баннер -->
-    <div class="w-full mb-16 shadow-md shadow-gray-200">
-        <div class="bg-gradient-to-t from-gray-50 w-full left-0">
-            <div class="m-0 m-auto max-w-screen-xl flex h-full">
-                <div class="flex justify-center w-1/2 flex-col pr-20">
-                    <div class="font-display -ml-1.5 leading-snug text-5xl">Быстрая доставка букетов</div>
+    <div class="w-full shadow-md shadow-gray-200">
+        <div class="bg-gradient-to-t from-gray-100 w-full left-0">
+            <div class="m-0 m-auto max-w-screen-xl flex h-full sm:p-0 py-20 relative overflow-hidden">
+                <div class="lg:p-0 sm:px-0 px-6 flex justify-center z-10 w-full lg:w-1/2 flex-col pr-24">
+                    <div class="font-display lg:-ml-1.5 leading-snug text-3xl sm:text-5xl">Быстрая доставка букетов</div>
 
-                    <div class="my-6">
+                    <div class="my-1 lg:my-6">
                         <svg width="80" height="54" viewBox="0 0 43 27" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <path fill-rule="evenodd" clip-rule="evenodd"
                                   d="M30.3854 12.8158C30.3981 12.7197 30.3306 12.6315 30.2346 12.6188C25.4653 11.9851 12.8194 11.427 0.326099 14.2559C0.231606 14.2773 0.172348 14.3712 0.193744 14.4657C0.215141 14.5602 0.309089 14.6195 0.403582 14.5981C12.8476 11.7803 25.4504 12.337 30.1884 12.9666C30.2844 12.9793 30.3726 12.9118 30.3854 12.8158Z"
@@ -22,21 +22,22 @@
                         </svg>
                     </div>
 
-                    <div class="font-serif leading-relaxed text-gray-500">Здесь будет текст, который очень важен, его никто не читает. Зюганов,
+                    <div class="lg:text-md text-sm font-serif leading-loose text-gray-700">Здесь будет текст, который очень важен, его никто не читает. Зюганов,
                         <span class="font-bold">Жириновский</span>. Джоч - мудак, отомстил за папу!
                     </div>
                 </div>
-                <div class="w-1/2">
-                    <img class="" :src="require(`@/assets/images/bouquet-banner.png`)" alt="">
+
+                <div class="lg:w-1/2 lg:static absolute w-full bottom-0 left-2/3 lg:scale-100 scale-150 lg:opacity-100 opacity-50">
+                    <img :src="require(`@/assets/images/bouquet-banner.png`)" alt="">
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Букеты -->
-    <div class="w-full mb-16">
+    <div id="bouquets" class="w-full py-16 lg:px-0 px-6">
         <div class="max-w-screen-xl m-0 m-auto">
-            <div class="mb-10">
+            <div class="mb-12">
                 <div class="font-medium mb-1 text-2xl uppercase">
                     Букеты
                 </div>
@@ -45,29 +46,47 @@
                 </div>
             </div>
 
-            <div class="uppercase mb-6 flex text-xs">
-                <div class="text-mainRed mr-12 cursor-pointer border-b border-mainRed">Все</div>
-                <div class="mr-12 cursor-pointer">Большие</div>
-                <div class="mr-12 cursor-pointer">Средние</div>
-                <div class="mr-12 cursor-pointer">Маленькие</div>
+            <div class="uppercase mb-6 flex md:justify-start justify-between md:px-0 px-10 text-xs">
+                <div class="text-mainRed md:mr-12 cursor-pointer border-b border-mainRed">Все</div>
+                <div class="md:mr-12 cursor-pointer">Большие</div>
+                <div class="md:mr-12 cursor-pointer">Средние</div>
+                <div class="md:mr-12 cursor-pointer">Маленькие</div>
             </div>
 
-            <div class="grid-cols-3 grid gap-12">
-                <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
-                <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
+            <div class="md:grid-cols-3 grid gap-12 lg:px-0 px-10">
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
+                <router-link :to="{ path: 'product' }">
+                    <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
+                </router-link>
             </div>
         </div>
     </div>
 
     <!-- О нас -->
-    <div class="bg-gradient-to-b from-gray-100 shadow-inner shadow-gray-200 pt-16 mb-20">
+    <div id="about" class="bg-gradient-to-b pt-16 lg:px-0 px-6 from-gray-100 shadow-inner shadow-gray-200 pt-16 mb-20">
 
         <div class="max-w-screen-xl m-0 m-auto">
             <div class="mb-12">
@@ -79,15 +98,18 @@
                 </div>
             </div>
 
-            <div class="flex">
-                <div class="w-1/3 font-bold font-display text-6xl -ml-1.5 -mt-2 text-mainRed">Кто мы?</div>
-                <div class="w-2/3 font-serif leading-loose text-gray-500 text-xl">
-                    <span class="font-bold">Florets </span>(/ ˈflɒrɪts / - ударение на “о”), предлагает бла бла взятый с потолка псевдо-латинский
-                    набор слов, но это не совсем так. Его корни уходят в один фрагмент классической <span
-                        class="text-mainRed font-bold">бесплатная
-                    доставка</span> двух тысячелетий назад. Ричард МакКлинток, профессор латыни из колледжа Hampden-Sydney, штат Вирджиния, взял
-                    одно из самых странных слов в Lorem Ipsum, "consectetur", и занялся его поисками в классической латинской литературе.
-                    В результате он нашёл неоспоримый первоисточник
+            <div class="sm:flex">
+                <div class="sm:w-1/3 font-bold font-display text-6xl -ml-1.5 mb-6 -mt-2 text-mainRed">Кто мы?</div>
+
+                <div class="sm:w-2/3 font-serif text-gray-500 sm:text-xl">
+                    <div class="leading-loose">
+                        <span class="font-bold">Florets </span>(/ ˈflɒrɪts / - ударение на “о”), предлагает бла бла взятый с потолка псевдо-латинский
+                        набор слов, но это не совсем так. Его корни уходят в один фрагмент классической <span
+                            class="text-mainRed font-bold">бесплатная
+                        доставка</span> двух тысячелетий назад. Ричард МакКлинток, профессор латыни из колледжа Hampden-Sydney, штат Вирджиния, взял
+                        одно из самых странных слов в Lorem Ipsum, "consectetur", и занялся его поисками в классической латинской литературе.
+                        В результате он нашёл неоспоримый первоисточник
+                    </div>
                 </div>
             </div>
         </div>

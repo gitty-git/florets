@@ -1,13 +1,14 @@
 <template>
     <div>
         <nav class="uppercase w-full shadow shadow-gray-150">
-            <div class="max-w-screen-xl m-0 m-auto items-center h-28 flex justify-between">
-                <div class="">
-                    <img class="w-24" src="@/assets/svg/logo.svg" alt="">
-                </div>
-                <div class="text-xs flex items-center">
-                    <router-link class="mr-12" to="#">Букеты</router-link>
-                    <router-link class="mr-12" to="#">О нас</router-link>
+            <div class="max-w-screen-xl m-0 m-auto lg:p-0 sm:px-0 px-6 items-center h-28 flex justify-between">
+                <router-link :to="{ name: 'home' }">
+                    <img class="w-20" :src="require(`@/assets/svg/logo.svg`)" alt="">
+                </router-link>
+
+                <div class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
+                    <a href="#bouquets" class="mr-12" to="#">Букеты</a>
+                    <a class="mr-12" href="#about">О нас</a>
                     <div class="border-r-2 mr-12 h-8 border-gray-150"></div>
                     <div class="mb-1 mr-2">
                         <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -17,13 +18,26 @@
                     </div>
                     <router-link to="#">Корзина (0 ₽)</router-link>
                 </div>
+
+                <div v-on:click="handleClick()" class="lg:absolute flex visible lg:invisible static lg:absolute">
+                    <svg width="24" height="24" viewBox="0 0 19 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <line x1="-2.91409e-08" y1="0.75" x2="19" y2="0.749999" stroke="black" stroke-width="0.5"/>
+                        <line x1="-2.91409e-08" y1="6.75" x2="19" y2="6.75" stroke="black" stroke-width="0.5"/>
+                        <line x1="-2.18557e-08" y1="12.75" x2="19" y2="12.75" stroke="black" stroke-width="0.5"/>
+                    </svg>
+                </div>
+
+                <div class="absolute w-full top-0 right-0 flex justify-center py-24 z-50">
+                    <div>О нас</div>
+                </div>
             </div>
         </nav>
 
         <router-view/>
 
+        <!-- Footer -->
         <div class="px-6">
-            <div class="border-t-2 my-16 border-gray-150">
+            <div class="border-t-2 border-gray-150">
                 <div class="w-full flex justify-center -mt-12">
                     <div class="p-5 bg-white rounded-full">
                         <svg width="45" height="45" viewBox="0 0 27 23" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -41,13 +55,13 @@
                     </div>
                 </div>
 
-                <div class="max-w-screen-xl m-0 m-auto flex mt-12 mb-16">
-                    <div class="w-1/3">
-                        <div class="font-medium uppercase mb-8">
+                <div class="max-w-screen-xl m-auto sm:flex mb-16">
+                    <div class="sm:w-1/3 my-16 sm:border-b-0 border-b-2 sm:pb-0 pb-12 sm:border-r-2 border-gray-150 sm:mr-12">
+                        <div class="font-medium uppercase mb-6">
                             Позвонить нам:
                         </div>
                         <div class="flex">
-                            <svg class="mr-4 mt-0.5" width="20" height="20" viewBox="0 0 11 11" fill="none"
+                            <svg class="mr-3 -ml-1 mt-0.5" width="20" height="20" viewBox="0 0 11 11" fill="none"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path fill-rule="evenodd" clip-rule="evenodd"
                                       d="M8.59385 5.04175L8.59102 5.15324L8.59385 5.27092L8.59115 5.38316L8.59382 5.50008L8.50734 9.28282C8.49658 9.75358 8.13854 10.1434 7.6704 10.1941C6.22767 10.3504 4.77229 10.3504 3.32956 10.1941C2.86142 10.1434 2.50338 9.75358 2.49262 9.28282L2.40614 5.50008L2.40883 5.38238L2.40615 5.27092L2.40897 5.1537L2.40613 5.04175L2.48345 1.99774C2.48396 1.97763 2.48493 1.95762 2.48636 1.93773L2.49146 1.72591C2.50311 1.24158 2.87302 0.84145 3.35494 0.791869C3.39505 0.787743 3.43517 0.783733 3.47529 0.779839C3.52971 0.767191 3.58551 0.757969 3.64247 0.752418C4.87789 0.632007 6.12209 0.632007 7.35751 0.752418C7.41446 0.757969 7.47026 0.76719 7.52467 0.779835C7.56481 0.78373 7.60494 0.787742 7.64506 0.791869C8.12698 0.84145 8.49689 1.24158 8.50854 1.72591L8.51365 1.93821C8.51506 1.95794 8.51602 1.97779 8.51653 1.99774L8.59385 5.04175ZM7.33332 8.13547C7.52317 8.13547 7.67707 7.98157 7.67707 7.79172C7.67707 7.60187 7.52317 7.44797 7.33332 7.44797H3.66666C3.47681 7.44797 3.32291 7.60187 3.32291 7.79172C3.32291 7.98157 3.47681 8.13547 3.66666 8.13547H7.33332ZM5.49999 9.94592C5.87969 9.94592 6.18749 9.63811 6.18749 9.25842C6.18749 8.87872 5.87969 8.57092 5.49999 8.57092C5.12029 8.57092 4.81249 8.87872 4.81249 9.25842C4.81249 9.63811 5.12029 9.94592 5.49999 9.94592Z"
@@ -58,8 +72,9 @@
                             </div>
                         </div>
                     </div>
-                    <div class="w-1/3">
-                        <div class="font-medium uppercase mb-8">
+
+                    <div class="sm:w-1/3 my-16 sm:border-b-0 border-b-2 sm:pb-0 pb-12 sm:border-r-2 border-gray-150 sm:mr-12">
+                        <div class="font-medium uppercase mb-6">
                             Мы в социальных сетях:
                         </div>
                         <div class="mb-3 flex">
@@ -102,11 +117,12 @@
                             </div>
                         </div>
                     </div>
-                    <div class="w-1/3">
-                        <div class="font-medium uppercase mb-12">
+
+                    <div class="sm:w-1/3 my-16 mr-12">
+                        <div class="font-medium uppercase mb-9">
                             Пользовательское соглашение:
                         </div>
-                        <div class="text-gray-500 hover:bg-black hover:text-white duration-100 hover:border-black cursor-pointer inline px-6 py-3 border border-gray-500 rounded-full">
+                        <div class="text-gray-500 hover:bg-black hover:text-white duration-100 hover:border-black cursor-pointer inline px-6 py-3 border border-gray-300 rounded-full">
                             Ознакомиться
                         </div>
                     </div>
@@ -118,6 +134,18 @@
         <div class="flex justify-center mb-16 text-gray-400 text-sm">© 2022 Florets, все права защищены.</div>
     </div>
 </template>
+
+<script setup>
+import { ref } from 'vue'
+
+const isMenuClicked = ref(false)
+
+const handleClick = () => {
+    isMenuClicked.value = !isMenuClicked.value
+    console.log('isMenuClicked.value')
+}
+</script>
+
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Noto+Serif+Display:wght@400;700&display=swap');
 </style>
