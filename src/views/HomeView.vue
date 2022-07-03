@@ -3,7 +3,7 @@
     <div class="w-full shadow-md shadow-gray-200">
         <div class="bg-gradient-to-t sm:mt-0 from-gray-100 w-full left-0">
             <div class="m-0 m-auto max-w-screen-xl flex h-full sm:p-0 py-20 relative overflow-hidden">
-                <div class="lg:p-0 sm:px-0 px-6 flex justify-center z-10 w-full lg:w-1/2 flex-col pr-24">
+                <div class="mx-6 flex justify-center z-10 w-full lg:w-1/2 flex-col pr-24">
                     <div class="font-display lg:-ml-1.5 leading-snug text-3xl sm:text-5xl">Быстрая доставка букетов</div>
 
                     <div class="my-1 lg:my-6">
@@ -35,8 +35,8 @@
     </div>
 
     <!-- Букеты -->
-    <div id="bouquets" class="w-full py-16 lg:px-0 px-6">
-        <div class="max-w-screen-xl m-0 m-auto">
+    <div id="bouquets" class="py-16 flex justify-center">
+        <div class="max-w-screen-xl px-6">
             <div class="mb-12">
                 <div class="font-medium mb-1 text-2xl uppercase">
                     Букеты
@@ -46,14 +46,14 @@
                 </div>
             </div>
 
-            <div class="uppercase mb-6 flex md:justify-start justify-between md:px-0 px-10 text-xs">
+            <div class="uppercase mb-6 flex md:justify-start justify-between md:px-0 px-6 text-xs">
                 <div class="text-mainRed md:mr-12 cursor-pointer border-b border-mainRed">Все</div>
                 <div class="md:mr-12 cursor-pointer">Большие</div>
                 <div class="md:mr-12 cursor-pointer">Средние</div>
                 <div class="md:mr-12 cursor-pointer">Маленькие</div>
             </div>
 
-            <div class="md:grid-cols-3 grid gap-12 lg:px-0 px-10">
+            <div class="md:grid-cols-3 grid gap-12 lg:px-0 px-6">
                 <router-link :to="{ path: 'product' }">
                     <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
                 </router-link>
@@ -86,9 +86,8 @@
     </div>
 
     <!-- О нас -->
-    <div id="about" class="bg-gradient-to-b pt-16 lg:px-0 px-6 from-gray-100 shadow-inner shadow-gray-200 pt-16 mb-20">
-
-        <div class="max-w-screen-xl m-0 m-auto">
+    <div id="about" class="bg-gradient-to-b pt-16 flex justify-center from-gray-100 shadow-inner shadow-gray-200 pt-16 mb-20">
+        <div class="max-w-screen-xl px-6 m-auto">
             <div class="mb-12">
                 <div class="font-medium mb-1 text-2xl uppercase">
                     О нас
@@ -117,7 +116,6 @@
 </template>
 
 <script>
-// @ is an alias to /src
 import Card from "@/components/Card";
 
 export default {
