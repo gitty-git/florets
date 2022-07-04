@@ -31,22 +31,22 @@
 
             <div class="flex sm:flex-row flex-col w-full mt-12 uppercase text-xs">
                 <div class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 sm:border-r-0 border-r-2 h-16">
-                    <div class="text-gray-500 ml-6">Количество</div>
+                    <div class="text-gray-500 ml-10">Количество</div>
 
                     <div class="flex justify-between items-center text-black font-bold mx-6">
-                        <div class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
+                        <div class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
                             <img class="w-2" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                         </div>
 
                         <div class="mx-4">2</div>
 
-                        <div class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
+                        <div class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
                             <img class="w-2 rotate-180" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                         </div>
                     </div>
                 </div>
 
-                <div class="sm:mt-0 mt-6 cursor-pointer hover:bg-white duration-150 hover:text-mainRed hover:border-2 border-mainRed bg-mainRed w-2/3 sm:w-96 text-white font-bold text-xs flex justify-center items-center uppercase h-16">
+                <div class="sm:mt-0 mt-6 cursor-pointer hover:bg-white duration-150 hover:text-mainRed border-2 border-mainRed bg-mainRed w-2/3 sm:w-96 text-white font-bold text-xs flex justify-center items-center uppercase h-16">
                     Добавить в корзину
                 </div>
             </div>

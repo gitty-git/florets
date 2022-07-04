@@ -3,6 +3,13 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
     {
+        // path: '/',
+        name: 'Bouquets',
+        el: document.getElementById('bouquets'),
+        top: 1000,
+        component: HomeView
+    },
+    {
         path: '/',
         name: 'home',
         component: HomeView
@@ -19,11 +26,30 @@ const routes = [
       path:'/cart',
       name: 'Cart',
       component: () => import('../views/Cart')
+    },
+    {
+        path:'/order',
+        name: 'Order',
+        component: () => import('../views/Order')
     }
 ]
 
 const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
+    scrollBehavior(to, from, savedPosition) {
+        if (to.hash) {
+            return {
+                el: to.hash,
+                behavior: 'smooth',
+                top: 75
+            }
+        }
+        if (savedPosition) {
+            return savedPosition
+        } else {
+            return { top: 0 }
+        }
+    },
     routes
 })
 

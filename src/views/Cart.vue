@@ -19,8 +19,8 @@
             <div class="flex py-6 items-center justify-between border-b-2 border-gray-150">
                 <div class="md:w-2/3 w-4/5 flex justify-between items-center">
                     <div class="w-1/2 flex items-start md:items-center md:flex-row flex-col">
-                        <div class="visible sm:text-md text-sm md:invisible static mb-3 md:absolute font-serif">Название букета</div>
-                        <img class="mb-4 md:mb-0 w-24 mr-6" :src="require(`@/assets/images/product-sm.png`)" alt="">
+                        <div class="visible sm:text-md text-sm md:invisible static mb-4 md:absolute font-serif">Название букета</div>
+                        <img class="md:mb-0 w-24 mr-6" :src="require(`@/assets/images/product-sm.png`)" alt="">
                         <div class="md:visible md:static absolute pr-6 invisible font-serif">Название букета</div>
                     </div>
 
@@ -37,11 +37,11 @@
                             </div>
                         </div>
 
-                        <div class="text-xs text-gray-400">3 500 ₽ / шт.</div>
+                        <div class="text-xs md:mt-0 mt-6 md:ml-0 ml-2.5 text-gray-400">3 500 ₽ / шт.</div>
                     </div>
                 </div>
 
-                <div class="md:w-1/3 w-1/5 flex flex-wrap justify-between items-center">
+                <div class="md:w-1/3 w-1/5 md:mt-0 mt-6 flex flex-wrap justify-between items-center">
                     <div class="md:w-1/2 w-full md:mb-0 md:text-xl mb-4 flex md:justify-start justify-end font-medium">7 000 ₽</div>
 
                     <div class="md:w-1/2 w-full flex justify-end">
@@ -49,7 +49,7 @@
                             <div class="mt-0.5">Удалить</div>
                         </div>
 
-                        <div class="visible text-xl text-mainRed flex justify-center items-center py-2 px-2 -mr-2 md:invisible static md:absolute">
+                        <div class="visible mt-1 text-xl text-mainRed flex justify-center items-center p-2 -mr-2 md:invisible static md:absolute">
                             &#9587;
                         </div>
                     </div>
@@ -57,7 +57,7 @@
             </div>
         </div>
 
-        <div class="flex justify-end mt-12 md:text-2xl">
+        <div class="flex justify-end md:mt-12 mt-6 md:text-2xl">
             <span class="text-gray-400">Итого:
             </span>&nbsp;<span class="font-medium">3</span>
             &nbsp;товара на сумму&nbsp;
@@ -66,7 +66,9 @@
 
         <!-- btn -->
         <div class="w-full flex sm:mt-24 mt-16 mb-8 sm:mb-12 justify-center">
-            <div class="uppercase hover:bg-white hover:text-mainRed duration-150 cursor-pointer border-2 border-mainRed py-6 bg-mainRed font-medium text-white px-12">Перейти к оформлению</div>
+            <router-link :to="{ name: 'Order' }">
+                <div class="uppercase hover:bg-white hover:text-mainRed duration-150 cursor-pointer border-2 border-mainRed py-6 bg-mainRed font-medium text-white px-8">Перейти к оформлению</div>
+            </router-link>
         </div>
     </div>
 </template>
