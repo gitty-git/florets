@@ -22,8 +22,8 @@
                         </svg>
                     </div>
 
-                    <div class="lg:text-md text-sm font-serif leading-loose text-gray-700">Здесь будет текст, который очень важен, его никто не читает. Зюганов,
-                        <span class="font-bold">Жириновский</span>. Джоч - мудак, отомстил за папу!
+                    <div class="lg:text-md text-sm font-serif leading-loose text-gray-700">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Assumenda, deserunt?
+                        <span class="font-bold">hello</span>. Consectetur adipisicing elit.
                     </div>
                 </div>
 
@@ -54,33 +54,11 @@
             </div>
 
             <div class="md:grid-cols-3 grid gap-12 lg:px-0 px-6">
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-1.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-2.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
-                <router-link :to="{ path: 'product' }">
-                    <Card img="b-3.png" name="Название букета" price="3 500 ₽"/>
-                </router-link>
+                <div v-for="product in products" :key="product.id">
+                    <router-link :to="{ path: 'product' }">
+                        <Card :pic="product.img" :name="product.name" :price="product.price"/>
+                    </router-link>
+                </div>
             </div>
         </div>
     </div>
@@ -115,11 +93,46 @@
     </div>
 </template>
 
-<script>
+<script setup>
 import Card from "@/components/Card";
+import { ref } from "vue";
 
-export default {
-    name: 'HomeView',
-    components: { Card, }
-}
+const products = ref([
+    {
+        id: '1',
+        name: 'Название букета 1',
+        price: 1500,
+        img: '1'
+    },
+    {
+        id: '2',
+        name: 'Название букета 2',
+        price: 2500,
+        img: '2'
+    },
+    {
+        id: '3',
+        name: 'Название букета 3',
+        price: 3500,
+        img: '3'
+    },
+    {
+        id: '4',
+        name: 'Название букета 4',
+        price: 4500,
+        img: '2'
+    },
+    {
+        id: '5',
+        name: 'Название букета 5',
+        price: 5500,
+        img: '3'
+    },
+    {
+        id: '6',
+        name: 'Название букета 6',
+        price: 6500,
+        img: '1'
+    },
+])
 </script>

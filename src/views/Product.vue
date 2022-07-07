@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="sm:mt-0 mt-6 cursor-pointer hover:bg-white duration-150 hover:text-mainRed border-2 border-mainRed bg-mainRed w-2/3 sm:w-96 text-white font-bold text-xs flex justify-center items-center uppercase h-16">
+                <div  @click="addProduct" class="sm:mt-0 mt-6 cursor-pointer hover:bg-white duration-150 hover:text-mainRed border-2 border-mainRed bg-mainRed w-2/3 sm:w-96 text-white font-bold text-xs flex justify-center items-center uppercase h-16">
                     Добавить в корзину
                 </div>
             </div>
@@ -58,9 +58,9 @@
     </div>
 </template>
 
-<script>
-export default {
-    name: "Product"
+<script setup>
+const addProduct = () => {
+    console.log('hello')
 }
 </script>
 

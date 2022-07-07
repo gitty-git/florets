@@ -9,7 +9,7 @@
                 <Input header="Телефон:"/>
             </div>
 
-            <Input header="Улица, дом:"/>
+            <Input placeholder="Россия, Челябинск, " header="Улица, дом:" customId="inputAddress"/>
 
             <div class="flex text-sm md:flex-row flex-col justify-center items-center mt-12">
                 <div class="mb-6 w-full">Выберете способ оплаты:</div>
@@ -25,25 +25,38 @@
             </div>
 
             <div class="w-full flex sm:mt-24 mt-16 mb-12 justify-center">
-                <router-link to="#">
-                    <div class="uppercase hover:bg-white hover:text-mainRed duration-150 cursor-pointer border-2 border-mainRed py-6 bg-mainRed font-medium text-white px-12">
+<!--                <router-link to="#">-->
+                    <div @click="handleBtn" class="uppercase hover:bg-white hover:text-mainRed duration-150 cursor-pointer border-2 border-mainRed py-6 bg-mainRed font-medium text-white px-12">
                         Подтвердить
                     </div>
-                </router-link>
+<!--                </router-link>-->
             </div>
         </div>
     </div>
 </template>
 
-<script>
+<script setup>
 import Input from "@/components/Input";
+import { onMounted, ref } from "vue";
 
-export default {
-    components: { Input },
-    name: "Order"
+const notice = ref('')
+const hint = ref('')
+
+const handleBtn = () => {
+
 }
+
+onMounted(() => {
+    ymaps.ready(() => {
+        new ymaps.SuggestView('inputAddress')
+    });
+})
 </script>
 
 <style scoped>
-
+#inputAddress {
+    background: red;
+    width: 300px;
+    margin: 5px;
+}
 </style>
