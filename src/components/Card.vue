@@ -8,10 +8,11 @@
 
 <script setup>
 import { computed, onMounted, ref } from "vue";
+import { formatPrice } from "@/functions";
 
 const props = defineProps(['pic', 'price', 'name'])
 
-const formattedPrice = computed(() => props.price.toLocaleString().replace(',', ' '))
+const formattedPrice = computed(() => formatPrice(props.price))
 </script>
 
 <style scoped>

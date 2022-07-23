@@ -17,11 +17,11 @@
                     <div class="font-display text-2xl lg:text-4xl">
                         Название букета
                     </div>
-                    <div class="text-sm mt-1.5 ml-4">⌀ 30 см</div>
+                    <div class="text-sm mt-1.5 ml-4">⌀ {{ product.size }} см</div>
                 </div>
 
                 <div class="text-gray-400 mt-2 text-xl">
-                    3 500 ₽
+                    {{ formattedPrice }} ₽
                 </div>
             </div>
 
@@ -30,38 +30,112 @@
             </div>
 
             <div class="flex sm:flex-row flex-col w-full mt-12 uppercase text-xs">
-                <div class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 sm:border-r-0 border-r-2 h-16">
+                <div v-if="!alreadyInCart" class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 sm:border-r-0 border-r-2 h-16">
                     <div class="text-gray-500 ml-10">Количество</div>
 
                     <div class="flex justify-between items-center text-black font-bold mx-6">
-                        <div class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
+                        <div @click="decrease" class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
                             <img class="w-2" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                         </div>
 
-                        <div class="mx-4">2</div>
+                        <div class="mx-4 w-4 flex justify-center">{{ amount }}</div>
 
-                        <div class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
+                        <div @click="increase" class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
                             <img class="w-2 rotate-180" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                         </div>
                     </div>
                 </div>
 
-                <div  @click="addProduct" class="sm:mt-0 mt-6 cursor-pointer hover:bg-white duration-150 hover:text-mainRed border-2 border-mainRed bg-mainRed w-2/3 sm:w-96 text-white font-bold text-xs flex justify-center items-center uppercase h-16">
-                    Добавить в корзину
+                <div class="sm:mt-0 mt-6 duration-150 w-2/3 sm:w-96 font-bold text-xs uppercase">
+                    <router-link class="text-mainRed flex border-2 h-16 flex justify-center border-opacity-20 items-center border-mainRed "
+                                 v-if="alreadyInCart"
+                                 :to="{name: 'Cart'}"
+                    >
+                        <div class="flex justify-center items-start">
+                            <div class="mr-1">{{ amount }} шт. В</div>
+                            <div>
+                                корзине
+                                <div class="border-t-2 border-mainRed"></div>
+                            </div>
+                        </div>
+                    </router-link>
+                    <div v-else
+                         class="hover:bg-white text-white bg-mainRed cursor-pointer hover:text-mainRed border-mainRed border-2 flex justify-center items-center h-16"
+                         @click="addProduct"
+                    >
+                        Добавить в корзину
+                    </div>
                 </div>
             </div>
 
             <div class="text-sm text-gray-400 mt-12">
-                <span class="text-black font-medium">ID продукта:</span> 09832475
+                <span class="text-black font-medium">ID продукта:</span> {{ product.id }}
             </div>
         </div>
     </div>
 </template>
 
 <script setup>
-const addProduct = () => {
-    console.log('hello')
+import { onMounted, computed, ref } from "vue";
+import { useRoute } from "vue-router";
+import { products } from "@/products";
+import { useStore } from 'vuex'
+import { formatPrice } from "@/functions";
+
+const store = useStore()
+
+const amount = ref(1)
+const alreadyInCart = ref(false)
+const route = useRoute()
+const product = ref({})
+
+const increase = () => {
+    if (amount.value < 999) amount.value++
 }
+
+const decrease = () => {
+    if (amount.value > 0) amount.value--
+}
+
+const formattedPrice = computed(() => {
+    return formatPrice(product.value.price)
+})
+
+const addProduct = () => {
+    const cart = []
+    const item = products.find(p => p.id === route.params.id)
+
+    if (cart.some(p => p.id === route.params.id)) {
+        alreadyInCart.value = true
+    }
+    else {
+        alreadyInCart.value = true
+        cart.push({...item, amount: amount.value})
+    }
+    localStorage.setItem("cart", JSON.stringify(cart))
+    let price = JSON.parse(localStorage.getItem("cart"))
+    console.log(price[0].price)
+    store.dispatch('setCart', {price: 123, count: 4})
+}
+
+const updateCart = () => {
+
+}
+
+const checkProductInCart = () => {
+    let cartProducts = JSON.parse(localStorage.getItem("cart")) || []
+    let cartProduct = cartProducts.find(p => p.id === product.value.id)
+    if (cartProduct) {
+        alreadyInCart.value = true
+        amount.value = cartProduct.amount
+    }
+}
+
+onMounted(() => {
+    product.value = products.find(p => p.id === route.params.id)
+    console.log(product.value)
+    checkProductInCart()
+})
 </script>
 
 <style scoped>

@@ -55,7 +55,7 @@
 
             <div class="md:grid-cols-3 grid gap-12 lg:px-0 px-6">
                 <div v-for="product in products" :key="product.id">
-                    <router-link :to="{ path: 'product' }">
+                    <router-link :to="{ name: 'Product', params: {id: product.id} }">
                         <Card :pic="product.img" :name="product.name" :price="product.price"/>
                     </router-link>
                 </div>
@@ -96,43 +96,7 @@
 <script setup>
 import Card from "@/components/Card";
 import { ref } from "vue";
+import { products } from "@/products" // remove after real db coming
 
-const products = ref([
-    {
-        id: '1',
-        name: 'Название букета 1',
-        price: 1500,
-        img: '1'
-    },
-    {
-        id: '2',
-        name: 'Название букета 2',
-        price: 2500,
-        img: '2'
-    },
-    {
-        id: '3',
-        name: 'Название букета 3',
-        price: 3500,
-        img: '3'
-    },
-    {
-        id: '4',
-        name: 'Название букета 4',
-        price: 4500,
-        img: '2'
-    },
-    {
-        id: '5',
-        name: 'Название букета 5',
-        price: 5500,
-        img: '3'
-    },
-    {
-        id: '6',
-        name: 'Название букета 6',
-        price: 6500,
-        img: '1'
-    },
-])
+const index = ref(products)
 </script>

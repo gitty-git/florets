@@ -16,7 +16,7 @@
                                   stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
                         </svg>
                     </div>
-                    <router-link :to="{ name: 'Cart' }">Корзина (0 ₽)</router-link>
+                    <router-link :to="{ name: 'Cart' }">{{ itemsInCart }}Корзина (0 ₽)</router-link>
                 </div>
 
                 <div v-show="!isClicked" @click="handeClick"
@@ -162,14 +162,21 @@
 </template>
 
 <script setup>
-import { ref } from "vue";
+import { computed, onMounted, ref } from "vue";
+import { useStore } from 'vuex'
 // let isClicked = false
-const isClicked = ref(false)
+let isClicked = ref(false)
+const store = useStore()
 
 const handeClick = () => {
     isClicked.value = !isClicked.value
-    console.log(isClicked.value)
 }
+
+const itemsInCart = computed(() => store.state.count)
+
+onMounted(() => {
+    // store.dispatch('setCart', {price: 3333, count: 4})
+})
 </script>
 
 <style>

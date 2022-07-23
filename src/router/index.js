@@ -3,7 +3,6 @@ import HomeView from '../views/HomeView.vue'
 
 const routes = [
     {
-        // path: '/',
         name: 'Bouquets',
         el: document.getElementById('bouquets'),
         top: 1000,
@@ -15,7 +14,7 @@ const routes = [
         component: HomeView
     },
     {
-        path: '/product',
+        path: '/product/:id',
         name: 'Product',
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
