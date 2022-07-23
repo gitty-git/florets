@@ -1,5 +1,5 @@
 <template>
-    <div class="px-6 m-0 lg:pt-16 pt-6 pb-20 m-auto max-w-screen-xl">
+    <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
         <div class="font-display text-2xl lg:text-4xl">Корзина</div>
 
         <!-- list -->
@@ -62,14 +62,14 @@
         <div class="flex justify-end md:mt-12 mt-6 md:text-2xl">
             <span class="text-gray-400">Итого:
             </span>&nbsp;<span class="font-medium">{{ productsLength }}</span>
-            &nbsp;товара на сумму&nbsp;
+            &nbsp;{{ pluralized }} на сумму&nbsp;
             <span class="font-medium">10 500</span>&nbsp;₽.
         </div>
 
         <!-- btn -->
-        <div class="w-full flex sm:mt-24 mt-16 mb-8 sm:mb-12 justify-center">
+        <div class="w-full flex mt-16 justify-center">
             <router-link :to="{ name: 'Order' }">
-                <div class="uppercase hover:bg-white hover:text-mainRed duration-150 cursor-pointer border-2 border-mainRed py-6 bg-mainRed font-medium text-white px-8">Перейти к оформлению</div>
+                <div class="btn text-sm">Перейти к оформлению</div>
             </router-link>
         </div>
     </div>
@@ -82,10 +82,16 @@ import { formatPrice } from "@/functions";
 const products = ref(null)
 const productsLength = ref(null)
 
+const pluralized = computed(() => {
+    if (/^[2-9]1|1$/.test(productsLength.value)) return 'товар'
+    else return 'товаров'
+})
+
 onMounted(() => {
     products.value = JSON.parse(localStorage.getItem("cart"))
+    productsLength.value = products.value.length
     // productsLength.value = products.value.length
-    console.log(products.value)
+    // console.log(products.value.length)
 })
 </script>
 

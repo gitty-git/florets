@@ -8,4 +8,7 @@
     .input {
         @apply border-2 mt-1 px-3 font-serif border-gray-150 w-full h-12;
     }
+    .btn {
+        @apply uppercase rounded text-xl hover:bg-white hover:text-mainRed duration-150 cursor-pointer border-2 border-mainRed py-6 bg-mainRed font-medium text-white px-12;
+    }
 }

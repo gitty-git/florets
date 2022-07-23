@@ -1,5 +1,5 @@
 <template>
-    <div class="px-6 m-0 lg:pt-16 pt-6 md:pb-20 pb-12 m-auto max-w-screen-xl">
+    <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
         <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
         <div class="font-sm text-gray-400 mt-4 mb-12">3 товара на сумму 3 500 ₽</div>
 
@@ -10,23 +10,26 @@
                 <div class="mt-6">
                     <label class="text-sm">Имя:</label>
                     <input v-model="form.name" class="input" type="text">
+
                     <div v-if="error.name" class="text-xs text-mainRed mt-1 absolute">{{ error.name }}</div>
                 </div>
 
                 <div class="mt-6">
                     <label class="text-sm">Телефон:</label>
                     <input v-model="form.phone" class="input" type="text" @focusout="checkPhone">
+
                     <div v-if="error.phone" class="text-xs text-mainRed mt-1 absolute">{{ error.phone }}</div>
                 </div>
             </div>
 
-
             <!-- address -->
             <div class="mt-12">
                 <label class="text-sm">Улица, дом:</label>
-                <div @click="handleAddressInput" @keydown="handleAddressInput">
-                    <input v-model="form.address" id="inputAddress" ref="addressInput"  class="input text-sm" type="text">
+                <div @click="handleAddressInput" @focusout="handleAddressInput" @keyup="handleAddressInput" @input="handleAddressInput">
+                    <input v-model="form.address" id="inputAddress" ref="addressInput" class="input" type="text">
                 </div>
+
+                <div v-if="error.address" class="text-xs text-mainRed mt-1 absolute">{{ error.address }}</div>
             </div>
 
             <!-- date -->
@@ -60,9 +63,9 @@
             </div>
 
             <!-- time -->
-            <div v-if="!availableHoursHidden" class="flex font-medium flex-col justify-center items-center mt-12">
+            <div v-if="!availableHoursHidden" class="flex flex-col justify-center items-center mt-12">
                 <div class="w-full pr-12 text-sm">Выберете желаемое время доставки:</div>
-                <div class="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
+                <div class="mt-6 grid font-medium grid-cols-2 sm:grid-cols-4 gap-3">
                     <div v-for="(hour, i) in availableHours" :key="i"
                     >
                         <div :class="{'border-mainRed text-mainRed': i === activeHour}" @click="handleHours(hour, i)"
@@ -73,21 +76,21 @@
             </div>
 
             <!-- payment -->
-            <div v-if="!paymentHidden" class="flex text-sm flex-col justify-center items-center mt-12">
-                <div class="mb-6 w-full">Выберете способ оплаты:</div>
-                <div class="flex font-medium">
+            <div v-if="!paymentHidden" class="flex flex-col justify-center items-center mt-12">
+                <div class="w-full pr-12 text-sm">Выберете способ оплаты:</div>
+                <div class="flex mt-6 font-medium">
                     <div @click="handlePayment('cash')"
                          :class="{'border-mainRed text-mainRed': activePayment === 'cash'}"
-                         class="cursor-pointer mr-3 px-4 py-2 text-sm rounded-full border-2 border-gray-150 uppercase">Наличными</div>
+                         class="cursor-pointer mr-3 px-4 py-2 rounded-full border-2 border-gray-150 uppercase">Наличными</div>
                     <div @click="handlePayment('card')"
                          :class="{'border-mainRed text-mainRed' : activePayment === 'card'}"
-                         class="cursor-pointer px-4 py-2 text-sm rounded-full border-2 border-gray-150 uppercase">Картой</div>
+                         class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 uppercase">Картой</div>
                 </div>
             </div>
 
             <!-- submit -->
             <div class="w-full flex mt-16 justify-center" v-if="!submitHidden">
-                <div @click="handleSubmit" class="uppercase hover:bg-white hover:text-mainRed duration-150 cursor-pointer border-2 border-mainRed py-6 bg-mainRed font-medium text-white px-12">
+                <div @click="handleSubmit" class="btn">
                     Подтвердить
                 </div>
             </div>
@@ -199,7 +202,48 @@ const checkPhone = () => {
 
 const handleAddressInput = () => {
     form.value.address = addressInput.value.value
-    console.log(form.value.address)
+    checkAddress()
+}
+
+const checkAddress = () => {
+    ymaps.geocode(form.value.address).then(function (res) {
+        let obj = res.geoObjects.get(0),
+                err, hint;
+
+        if (obj) {
+            // Об оценке точности ответа геокодера можно прочитать тут: https://tech.yandex.ru/maps/doc/geocoder/desc/reference/precision-docpage/
+            switch (obj.properties.get('metaDataProperty.GeocoderMetaData.precision')) {
+                case 'exact':
+                    break;
+                case 'number':
+                case 'near':
+                case 'range':
+                    err = 'Неточный адрес, требуется уточнение';
+                    hint = 'Уточните номер дома';
+                    break;
+                case 'street':
+                    err = 'Неполный адрес, требуется уточнение';
+                    hint = 'Уточните номер дома';
+                    break;
+                case 'other':
+                default:
+                    err = 'Неточный адрес, требуется уточнение';
+                    hint = 'Уточните адрес';
+            }
+        } else {
+            err = 'Адрес не найден';
+            hint = 'Уточните адрес';
+        }
+
+        // Если геокодер возвращает пустой массив или неточный результат, то показываем ошибку.
+        if (err) {
+            error.value.address = err
+        } else {
+            error.value.address = false
+            // console.log(obj);
+        }
+    }, function (e) {
+    })
 }
 
 const handleSubmit = () => {
@@ -218,6 +262,13 @@ const handleSubmit = () => {
 
 watchEffect(() => {
     formatPhone(form.value.phone)
+})
+
+watchEffect(() => {
+    const cond = /^Россия, Челябинск,.*$|.*Челябинск, Россия$/.test(form.value.address)
+    if (!cond) {
+        form.value.address = 'Россия, Челябинск, '
+    }
 })
 
 const availableDates = computed(() => {
