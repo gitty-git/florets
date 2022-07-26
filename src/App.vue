@@ -10,13 +10,24 @@
                     <router-link class="mr-12" to="/#bouquets">Букеты</router-link>
                     <router-link class="mr-12" to="/#about">О нас</router-link>
                     <div class="border-r-2 mr-12 h-8 border-gray-150"></div>
-                    <div class="mb-1 mr-2">
-                        <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
-                            <path d="M17.3337 9.75001V6.50001C17.3337 4.10677 15.3936 2.16667 13.0004 2.16667C10.6072 2.16667 8.66706 4.10677 8.66706 6.50001V9.75M3.89173 11.2146L3.24173 18.148C3.05691 20.1193 2.96451 21.105 3.29161 21.8663C3.57896 22.5351 4.08252 23.0881 4.72158 23.4366C5.44904 23.8333 6.43904 23.8333 8.41902 23.8333H17.5818C19.5617 23.8333 20.5517 23.8333 21.2792 23.4366C21.9183 23.0881 22.4218 22.5351 22.7092 21.8663C23.0363 21.105 22.9439 20.1193 22.7591 18.148L22.1091 11.2146C21.953 9.54996 21.875 8.71763 21.5006 8.08835C21.1709 7.53414 20.6838 7.09054 20.1012 6.814C19.4397 6.50001 18.6037 6.50001 16.9318 6.50001L9.06903 6.50001C7.39705 6.50001 6.56107 6.50001 5.89959 6.814C5.31703 7.09054 4.8299 7.53414 4.50019 8.08835C4.12582 8.71763 4.04779 9.54996 3.89173 11.2146Z"
-                                  stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
-                        </svg>
-                    </div>
-                    <router-link :to="{ name: 'Cart' }">{{ itemsInCart }}Корзина (0 ₽)</router-link>
+                        <router-link :to="{ name: 'Cart' }" class="flex items-center">
+                            <div class="mr-3 mb-1">
+                                <div v-if="itemsInCart.amount > 0"
+                                     class="ml-3 w-5 h-5 flex items-center justify-center -mt-1 text-white font-medium px-1 bg-mainRed rounded-full absolute"
+                                     :class="{'w-auto': itemsInCart.amount > 99}"
+                                >
+                                    {{ itemsInCart.amount }}
+                                </div>
+                                <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M17.3337 9.75001V6.50001C17.3337 4.10677 15.3936 2.16667 13.0004 2.16667C10.6072 2.16667 8.66706 4.10677 8.66706 6.50001V9.75M3.89173 11.2146L3.24173 18.148C3.05691 20.1193 2.96451 21.105 3.29161 21.8663C3.57896 22.5351 4.08252 23.0881 4.72158 23.4366C5.44904 23.8333 6.43904 23.8333 8.41902 23.8333H17.5818C19.5617 23.8333 20.5517 23.8333 21.2792 23.4366C21.9183 23.0881 22.4218 22.5351 22.7092 21.8663C23.0363 21.105 22.9439 20.1193 22.7591 18.148L22.1091 11.2146C21.953 9.54996 21.875 8.71763 21.5006 8.08835C21.1709 7.53414 20.6838 7.09054 20.1012 6.814C19.4397 6.50001 18.6037 6.50001 16.9318 6.50001L9.06903 6.50001C7.39705 6.50001 6.56107 6.50001 5.89959 6.814C5.31703 7.09054 4.8299 7.53414 4.50019 8.08835C4.12582 8.71763 4.04779 9.54996 3.89173 11.2146Z"
+                                          stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                                </svg>
+                            </div>
+                            <div>
+                                Корзина ({{ formatPrice(itemsInCart.price) }} ₽)
+                            </div>
+                        </router-link>
+                    <router-link :to="{ name: 'Cart' }"></router-link>
                 </div>
 
                 <div v-show="!isClicked" @click="handeClick"
@@ -164,6 +175,8 @@
 <script setup>
 import { computed, onMounted, ref } from "vue";
 import { useStore } from 'vuex'
+import { formatPrice } from "@/functions";
+
 // let isClicked = false
 let isClicked = ref(false)
 const store = useStore()
@@ -172,10 +185,22 @@ const handeClick = () => {
     isClicked.value = !isClicked.value
 }
 
-const itemsInCart = computed(() => store.state.count)
+const itemsInCart = computed(() => store.state.cart)
+
+const setItemsInCart = () => {
+    let cart = JSON.parse(localStorage.getItem("cart")) || []
+
+    const cartItems = cart.reduce((acc, {price, amount}) => {
+        acc.price += price * amount
+        acc.amount += amount
+        return acc
+    }, {price: 0, amount: 0})
+
+    store.dispatch('setCart', {amount: cartItems.amount, price: cartItems.price})
+}
 
 onMounted(() => {
-    // store.dispatch('setCart', {price: 3333, count: 4})
+    setItemsInCart()
 })
 </script>
 

@@ -53,9 +53,9 @@
                     >
                         <div class="flex justify-center items-start">
                             <div class="mr-1">{{ amount }} шт. В</div>
-                            <div>
+                            <div class="relative">
                                 корзине
-                                <div class="border-t-2 border-mainRed"></div>
+                                <div class="border-b-2 w-full absolute border-mainRed"/>
                             </div>
                         </div>
                     </router-link>
@@ -90,32 +90,37 @@ const route = useRoute()
 const product = ref({})
 
 const increase = () => {
-    if (amount.value < 999) amount.value++
+    if (amount.value < 99) amount.value++
 }
 
 const decrease = () => {
-    if (amount.value > 0) amount.value--
+    if (amount.value > 1) amount.value--
 }
 
 const formattedPrice = computed(() => {
     return formatPrice(product.value.price)
 })
 
+const getLocalProducts = () => {
+    return JSON.parse(localStorage.getItem("cart")) || []
+}
+
 const addProduct = () => {
-    const cart = []
+    let cart = getLocalProducts()
+    // console.log(cart, 222)
     const item = products.find(p => p.id === route.params.id)
 
-    if (cart.some(p => p.id === route.params.id)) {
-        alreadyInCart.value = true
-    }
-    else {
-        alreadyInCart.value = true
-        cart.push({...item, amount: amount.value})
-    }
+    alreadyInCart.value = true
+    cart.push({...item, amount: amount.value})
+
+    const cartItems = cart.reduce((acc, {price, amount}) => {
+        acc.price += price * amount
+        acc.amount += amount
+        return acc
+    }, {price: 0, amount: 0})
+
+    store.dispatch('setCart', {amount: cartItems.amount, price: cartItems.price})
     localStorage.setItem("cart", JSON.stringify(cart))
-    let price = JSON.parse(localStorage.getItem("cart"))
-    console.log(price[0].price)
-    store.dispatch('setCart', {price: 123, count: 4})
 }
 
 const updateCart = () => {
@@ -133,7 +138,6 @@ const checkProductInCart = () => {
 
 onMounted(() => {
     product.value = products.find(p => p.id === route.params.id)
-    console.log(product.value)
     checkProductInCart()
 })
 </script>
