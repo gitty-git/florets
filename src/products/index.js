@@ -42,4 +42,18 @@ export const products = [
         img: '1',
         size: '20'
     },
+    {
+        id: '6',
+        name: 'Название букета 7',
+        price: 2500,
+        img: '2',
+        size: '64'
+    },
+    {
+        id: '7',
+        name: 'Название букета 8',
+        price: 2500,
+        img: '3',
+        size: '64'
+    },
 ]

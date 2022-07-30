@@ -1,9 +1,9 @@
 <template>
     <div>
-        <nav class="uppercase fixed top-0 bg-white z-30 w-full shadow shadow-gray-150">
+        <nav class="uppercase fixed top-0 bg-white z-30 w-full shadow-line">
             <div class="max-w-screen-xl m-0 m-auto px-6 items-center h-28 flex justify-between">
                 <router-link :to="{ name: 'home' }">
-                    <img class="w-20" :src="require(`@/assets/svg/logo.svg`)" alt="">
+                    <img class="w-20 ml-0.5" :src="require(`@/assets/svg/logo.svg`)" alt="">
                 </router-link>
 
                 <div class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
@@ -69,7 +69,7 @@
         </div>
 
         <div class="max-w-screen-xl px-6 m-auto lg:flex mb-16">
-            <div class="lg:w-1/3 my-16 lg:pr-12 lg:border-b-0 border-b-2 lg:pb-0 pb-12 lg:border-r-2 border-gray-150 ">
+            <div class="lg:w-1/3 my-16 lg:pr-12 lg:border-b-0 border-b-2 lg:pb-0 pb-12 lg:border-r-2 border-gray-150">
                 <div class="font-medium uppercase mb-6">
                     Позвонить нам:
                 </div>
@@ -86,7 +86,7 @@
                 </div>
             </div>
 
-            <div class="lg:w-1/3 lg:px-12 my-16 lg:border-b-0 border-b-2 lg:pb-0 pb-12 lg:border-r-2 border-gray-150 ">
+            <div class="lg:w-1/3 lg:px-12 my-16 lg:border-b-0 border-b-2 lg:pb-0 pb-12 lg:border-r-2 border-gray-150">
                 <div class="font-medium uppercase mb-6">
                     Мы в социальных сетях:
                 </div>
@@ -146,7 +146,7 @@
 
         <!-- mobile menu -->
         <transition
-                enter-active-class="duration-300 ease-out"
+                enter-active-class="duration-200 ease-out"
                 enter-from-class="transform opacity-0"
                 enter-to-class="opacity-100"
                 leave-active-class="duration-200 ease-in"
@@ -155,18 +155,22 @@
         >
             <div v-show="isClicked"
                  class="blurred shadow-md fixed w-full py-24 top-0 right-0 text-2xl flex flex-col items-center">
-                <div class="mb-12 p-4" @click="isClicked = !isClicked">&#9587;</div>
+                <div class="mb-12 p-4 font-black" @click="isClicked = !isClicked">&#9587;</div>
+
                 <div @click.stop="isClicked = !isClicked" class="mb-12">
                     <router-link to="/#bouquets">Букеты</router-link>
                 </div>
+
                 <div @click.stop="isClicked = !isClicked" class="mb-12">
                     <router-link to="/#about">О нас</router-link>
                 </div>
+
                 <div @click.stop="isClicked = !isClicked">
-                    <router-link :to="{ name: 'Cart' }">Корзина (0 ₽)</router-link>
+                    <router-link :to="{ name: 'Cart' }">Корзина ({{ formatPrice(itemsInCart.price) }} ₽)</router-link>
                 </div>
             </div>
         </Transition>
+
         <div v-show="isClicked" @click="isClicked = !isClicked"
              class="bg-black opacity-0 fixed top-0 bottom-0 z-30 h-full w-screen"></div>
     </div>

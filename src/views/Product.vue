@@ -1,7 +1,7 @@
 <template>
-    <div class="px-6 m-0 lg:pt-16 pt-6 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
+    <div class="px-6 m-0 lg:pt-16 pt-12 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
         <div class="lg:w-1/2 w-full mb-12 sm:flex-row flex-col flex justify-between">
-            <img class="mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="require(`@/assets/images/product.png`)" alt="">
+            <img class="mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="require(`@/assets/images/b-${product.img}.png`)" alt="">
 
             <div class="sm:w-1/6 sm:flex sm:flex-col grid grid-cols-4 gap-x-6 items-stretch justify-between">
                 <img class="sm:mr-0 hover:scale-105 cursor-pointer duration-150" :src="require(`@/assets/images/product-sm.png`)" alt="">
@@ -29,16 +29,16 @@
                 Многие думают, что Lorem Ipsum - взятый с потолка псевдо-латинский набор слов, но это не совсем так. Его корни уходят в один фрагмент классической латыни 45 года н.э., то есть более двух тысячелетий назад. Ричард МакКлинток, профессор латыни из колледжа
             </div>
 
-            <div class="flex sm:flex-row flex-col w-full mt-12 uppercase text-xs">
+            <div class="flex sm:flex-row flex-col w-full mt-12 uppercase">
                 <div v-if="!alreadyInCart" class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 sm:border-r-0 border-r-2 h-16">
-                    <div class="text-gray-500 ml-10">Количество</div>
+                    <div class="text-gray-500 ml-10 text-xs">Количество:</div>
 
                     <div class="flex justify-between items-center text-black font-bold mx-6">
                         <div @click="decrease" class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
                             <img class="w-2" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                         </div>
 
-                        <div class="mx-4 w-4 flex justify-center">{{ amount }}</div>
+                        <div class="mx-4 w-4 flex font-bold justify-center">{{ amount }}</div>
 
                         <div @click="increase" class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
                             <img class="w-2 rotate-180" :src="require(`@/assets/svg/arrow.svg`)" alt="">
@@ -76,7 +76,7 @@
 </template>
 
 <script setup>
-import { onMounted, computed, ref } from "vue";
+import { onMounted, computed, ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
 import { products } from "@/products";
 import { useStore } from 'vuex'
@@ -88,6 +88,7 @@ const amount = ref(1)
 const alreadyInCart = ref(false)
 const route = useRoute()
 const product = ref({})
+const cart = ref([])
 
 const increase = () => {
     if (amount.value < 99) amount.value++
@@ -106,25 +107,23 @@ const getLocalProducts = () => {
 }
 
 const addProduct = () => {
-    let cart = getLocalProducts()
-    // console.log(cart, 222)
     const item = products.find(p => p.id === route.params.id)
 
     alreadyInCart.value = true
-    cart.push({...item, amount: amount.value})
+    cart.value.push({...item, amount: amount.value})
 
-    const cartItems = cart.reduce((acc, {price, amount}) => {
+    updateCart()
+}
+
+const updateCart = () => {
+    const cartItems = cart.value.reduce((acc, {price, amount}) => {
         acc.price += price * amount
         acc.amount += amount
         return acc
     }, {price: 0, amount: 0})
 
     store.dispatch('setCart', {amount: cartItems.amount, price: cartItems.price})
-    localStorage.setItem("cart", JSON.stringify(cart))
-}
-
-const updateCart = () => {
-
+    localStorage.setItem("cart", JSON.stringify(cart.value))
 }
 
 const checkProductInCart = () => {
@@ -136,8 +135,13 @@ const checkProductInCart = () => {
     }
 }
 
-onMounted(() => {
+onBeforeMount(() => {
     product.value = products.find(p => p.id === route.params.id)
+})
+
+onMounted(() => {
+
+    cart.value = JSON.parse(localStorage.getItem("cart")) || []
     checkProductInCart()
 })
 </script>

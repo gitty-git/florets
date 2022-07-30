@@ -13,6 +13,7 @@ module.exports = {
             },
             colors: {
                 'mainRed': '#EC0121',
+                'mainRed-400': '#ed344d',
                 'gray': {
                     50: '#fafafa',
                     100: '#f5f5f5',
@@ -28,7 +29,10 @@ module.exports = {
                 },
             },
             spacing: {
-                '400': '60rem',
+                '400': '40rem',
+            },
+            boxShadow: {
+                'line': '0 1px 2px 0px rgba(0, 0, 0, 0.075)',
             }
         },
     },

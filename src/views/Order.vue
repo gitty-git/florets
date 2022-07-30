@@ -1,7 +1,7 @@
 <template>
     <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
         <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
-        <div class="font-sm text-gray-400 mt-4 mb-12">3 товара на сумму 3 500 ₽</div>
+        <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} товара на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
 
         <!-- form -->
         <div class="max-w-screen-sm m-0 m-auto">
@@ -45,8 +45,8 @@
 
                          v-for="(d, i) in availableDates" :key="i"
                     >
-                        <div @click="handlePickedDate(d.date, i)" v-if="d.available" class="cursor-pointer flex items-end">
-                            <div class="text-xl w-14 h-14 rounded-full flex justify-center items-center"
+                        <div v-if="d.available" class="cursor-pointer flex items-end">
+                            <div @click="handlePickedDate(d.date, i)" class="text-xl w-14 h-14 rounded-full flex justify-center items-center"
                                  :class="{'border-mainRed border-2 text-mainRed' : activeDate === i}"
                             >
                                 {{ d.date.getDate() }}
@@ -101,7 +101,12 @@
 <script setup>
 import Input from "@/components/Input";
 import { computed, onMounted, ref, watchEffect } from "vue";
+import { useStore } from 'vuex'
+import { formatPrice } from '@/functions'
 
+const store = useStore()
+
+const itemsInCart = computed(() => store.state.cart)
 const notice = ref('')
 const dates = ref([])
 const timePeriods = ref([])
@@ -169,7 +174,7 @@ const setAvailableHours = (date) => {
     hours = (endHour /* +1 if time set 23:59 */ - startHour)
     availableStartHour = startHour
 
-    if (currDate.getDate() === date.getDate()) {
+    if (currDate.getDate() === date.getDate() && currDate.getHours() > startHour + 1) {
         hours = (endHour /* +1 if time set 23:59 */ - startHour) - (currDate.getHours() - startHour + 1)
         availableStartHour = currDate.getHours() + 1
     }
