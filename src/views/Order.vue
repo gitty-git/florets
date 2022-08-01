@@ -72,7 +72,6 @@
                              class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 flex justify-center">{{ hour }}:00 - {{ hour + 2 }}:00</div>
                     </div>
                 </div>
-
             </div>
 
             <!-- payment -->

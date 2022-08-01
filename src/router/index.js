@@ -30,7 +30,17 @@ const routes = [
         path:'/order',
         name: 'Order',
         component: () => import('../views/Order')
-    }
+    },
+    {
+        path:'/register',
+        name: 'Register',
+        component: () => import('../views/Register')
+    },
+    {
+        path:'/login',
+        name: 'Login',
+        component: () => import('../views/Login')
+    },
 ]
 
 const router = createRouter({
