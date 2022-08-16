@@ -3,6 +3,9 @@ module.exports = {
     content: ['./public/**/*.html', './src/**/*.{vue,js,ts,jsx,tsx}'],
     theme: {
         extend: {
+            zIndex: {
+                '60': '60',
+            },
             fontFamily: {
                 'serif': ["Noto Serif"],
                 'sans': ["Montserrat"],
@@ -28,8 +31,12 @@ module.exports = {
                     900: '#171717',
                 },
             },
+            margin: {
+                '4.5': '1.125rem',
+            },
             spacing: {
-                '400': '40rem',
+                '128': '32rem',
+                '160': '40rem',
             },
             boxShadow: {
                 'line': '0 1px 2px 0px rgba(0, 0, 0, 0.075)',

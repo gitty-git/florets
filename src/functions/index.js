@@ -3,7 +3,10 @@ const formatPrice = (price) => {
     // console.log('hello').toLocaleString().replace(',', ' ')
 }
 
-const func2 = () => {
+const pluralize = (str) => {
+    if (/^1$|^[2-9]1$/.test(str.toString())) return 'товар'
+    if(/^[2-4]$|^[2-9][2-4]$/.test(str.toString())) return 'товара'
+    else return 'товаров'
 }
 
-export {formatPrice, func2}
+export {formatPrice, pluralize}

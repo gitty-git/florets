@@ -14,7 +14,7 @@ const routes = [
         component: HomeView
     },
     {
-        path: '/product/:id',
+        path: '/products/:id',
         name: 'Product',
         // route level code-splitting
         // this generates a separate chunk (about.[hash].js) for this route
@@ -40,6 +40,26 @@ const routes = [
         path:'/login',
         name: 'Login',
         component: () => import('../views/Login')
+    },
+    {
+        path:'/admin',
+        name: 'Admin',
+        component: () => import('../views/Admin')
+    },
+    {
+        path:'/employee',
+        name: 'Employee',
+        component: () => import('../views/Employee')
+    },
+    {
+        path:'/:role/orders',
+        name: 'OrderList',
+        component: () => import('../views/dashboard/OrderList')
+    },
+    {
+        path:'/:role/orders/:id',
+        name: 'ViewOrder',
+        component: () => import('../views/dashboard/ViewOrder')
     },
 ]
 

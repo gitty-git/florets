@@ -1,12 +1,12 @@
 <template>
     <!-- Баннер -->
     <div class="w-full relative flex items-center">
-        <img class="object-cover w-full h-96 sm:h-400" :src="require(`@/assets/images/banner3.jpg`)" alt="">
+        <img class="object-cover w-full h-128 sm:h-160" :src="require(`@/assets/images/banner3.jpg`)" alt="">
         <div class="w-full absolute">
             <div class="max-w-screen-xl m-0 m-auto">
                 <div class="px-6 w-full flex flex-col items-center">
                     <div class="font-display text-center text-white uppercase font-black lg:-ml-1.5 leading-snug text-3xl sm:text-6xl">
-                        Доставка букетов
+                        Доставка цветов в Челябинске
                     </div>
 
                     <div class="mt-6 mb-4">
@@ -26,7 +26,7 @@
                     </div>
 
                     <div class="lg:text-md sm:w-1/2 w-2/3 text-center font-serif leading-relaxed text-white">
-                        Быстрая сборка и доставка букетов в любую точку города Челябинска.
+                        Мы знаем, что дарить так же приятно, как и получать.
                     </div>
 
                     <router-link
@@ -89,12 +89,12 @@
                 </div>
             </div>
 
-            <div class="uppercase mb-6 flex md:justify-start justify-between md:px-0 px-6 text-xs">
-                <div class="text-mainRed md:mr-12 cursor-pointer border-b border-mainRed">Все</div>
-                <div class="md:mr-12 cursor-pointer">Большие</div>
-                <div class="md:mr-12 cursor-pointer">Средние</div>
-                <div class="md:mr-12 cursor-pointer">Маленькие</div>
-            </div>
+<!--            <div class="uppercase mb-6 flex md:justify-start justify-between md:px-0 px-6 text-xs">-->
+<!--                <div class="text-mainRed md:mr-12 cursor-pointer border-b border-mainRed">Все</div>-->
+<!--                <div class="md:mr-12 cursor-pointer">Большие</div>-->
+<!--                <div class="md:mr-12 cursor-pointer">Средние</div>-->
+<!--                <div class="md:mr-12 cursor-pointer">Маленькие</div>-->
+<!--            </div>-->
 
             <div class="lg:grid-cols-4 md:grid-cols-2 grid gap-12 lg:px-0 px-6">
                 <div v-for="product in products" :key="product.id">
@@ -123,13 +123,26 @@
 
                 <div class="sm:w-2/3 font-serif text-gray-500 sm:text-xl">
                     <div class="leading-loose">
-                        <span class="font-bold">Florets </span>(/ ˈflɒrɪts / - ударение на “о”), предлагает бла бла взятый с потолка псевдо-латинский
-                        набор слов, но это не совсем так. Его корни уходят в один фрагмент классической <span
-                            class="text-mainRed font-bold">бесплатная
-                        доставка</span> двух тысячелетий назад. Ричард МакКлинток, профессор латыни из колледжа Hampden-Sydney, штат Вирджиния, взял
-                        одно из самых странных слов в Lorem Ipsum, "consectetur", и занялся его поисками в классической латинской литературе.
-                        В результате он нашёл неоспоримый первоисточник
+                        <span class="font-bold">Florets </span>(/ ˈflɒrɪts / - ударение на “о”) - это красиво, идеально рассчитано по времени и доставлено с учетом каждой мелочи. Мы поможем вам поделиться чем-то реальным с людьми, которые вам небезразличны. Наши флористы гарантируют, что всякий раз, заказывая букет у Florets, вы и ваши близкие получете созданный с любовью праздник естественной красоты.
                     </div>
+
+                    <ul class="leading-loose mt-9">
+                        <li class="mt-3">
+                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-75 absolute"></span>
+                            <span class="sm:ml-0 ml-4">Мы гарантируем, что все наши цветы будут свежими не менее 7 дней.</span>
+
+                        </li>
+
+                        <li class="mt-3">
+                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-75 absolute"></span>
+                            <span class="sm:ml-0 ml-4">Каждый букет создается опытным флористом.</span>
+                        </li>
+
+                        <li class="mt-3">
+                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-75 absolute"></span>
+                            <span class="sm:ml-0 ml-4">Бесплатная доставка в любую точку города Челябинска.</span>
+                        </li>
+                    </ul>
                 </div>
             </div>
         </div>
@@ -138,8 +151,25 @@
 
 <script setup>
 import Card from "@/components/Card";
-import { ref } from "vue";
-import { products } from "@/products" // remove after real db coming
+import { onMounted, ref } from "vue";
+import axios from 'axios'
+// import { products } from "@/products" // remove after real db coming
+
+const products = ref([])
+
+onMounted(async () => {
+    // await axios.get('/sanctum/csrf-cookie');
+    // await axios.post('/api/products')
+    //         .then(res => console.log(res))
+    //         .catch(err => console.log(err));
+    axios
+        .get('http://127.0.0.1:8000/api/products')
+        .then(response => {
+            products.value = response.data
+        })
+})
 
 const index = ref(products)
 </script>
+<style>
+</style>

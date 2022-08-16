@@ -1,7 +1,7 @@
 <template>
     <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
         <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
-        <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} товара на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
+        <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} {{ pluralizedGoods }} на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
 
         <!-- form -->
         <div class="max-w-screen-sm m-0 m-auto">
@@ -37,25 +37,24 @@
                 <div class="w-full pr-12 text-sm">Выберете желаемую дату доставки:</div>
 
                 <div class="grid grid-cols-7 gap-6 w-full mt-6">
-                    <div v-for="d in weekdays" class="text-xs text-gray-400 flex justify-center items-center">
-                        {{ d }}
+                    <div v-for="day in weekdays" class="text-xs text-gray-400 flex justify-center items-center">
+                        {{ day }}
                     </div>
 
                     <div class="flex font-medium justify-center items-center"
-
-                         v-for="(d, i) in availableDates" :key="i"
+                         v-for="(data, i) in dates" :key="i"
                     >
-                        <div v-if="d.available" class="cursor-pointer flex items-end">
-                            <div @click="handlePickedDate(d.date, i)" class="text-xl w-14 h-14 rounded-full flex justify-center items-center"
+                        <div v-if="data.available" class="cursor-pointer flex items-end">
+                            <div @click="handlePickedDate(data.date, i)" class="text-xl w-14 h-14 rounded-full flex justify-center items-center"
                                  :class="{'border-mainRed border-2 text-mainRed' : activeDate === i}"
                             >
-                                {{ d.date.getDate() }}
+                                {{ data.date.getDate() }}
                             </div>
                         </div>
 
                         <div v-else class="flex items-end">
                             <div class="text-xl text-gray-300">
-                                {{ d.date.getDate() }}
+                                {{ data.date.getDate() }}
                             </div>
                         </div>
                     </div>
@@ -66,10 +65,12 @@
             <div v-if="!availableHoursHidden" class="flex flex-col justify-center items-center mt-12">
                 <div class="w-full pr-12 text-sm">Выберете желаемое время доставки:</div>
                 <div class="mt-6 grid font-medium grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div v-for="(hour, i) in availableHours" :key="i"
+                    <div v-for="(date, i) in availableHours" :key="i"
                     >
-                        <div :class="{'border-mainRed text-mainRed': i === activeHour}" @click="handleHours(hour, i)"
-                             class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 flex justify-center">{{ hour }}:00 - {{ hour + 2 }}:00</div>
+                        <div :class="{'border-mainRed text-mainRed': i === activeHour}" @click="handleHours(date, i)"
+                             class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 flex justify-center">
+                            {{ date.getHours() }}:00 - {{ date.getHours() + 2 === 24 ? '00' : date.getHours() + 2 }}:00
+                        </div>
                     </div>
                 </div>
             </div>
@@ -88,7 +89,7 @@
             </div>
 
             <!-- submit -->
-            <div class="w-full flex mt-16 justify-center" v-if="!submitHidden">
+            <div v-if="!submitHidden" class="w-full flex mt-16 justify-center" >
                 <div @click="handleSubmit" class="btn">
                     Подтвердить
                 </div>
@@ -101,27 +102,27 @@
 import Input from "@/components/Input";
 import { computed, onMounted, ref, watchEffect } from "vue";
 import { useStore } from 'vuex'
-import { formatPrice } from '@/functions'
+import { formatPrice, pluralize } from '@/functions'
+import axios from "axios";
 
 const store = useStore()
 
-const itemsInCart = computed(() => store.state.cart)
+const itemsInCart = computed(() => store.state.cart.items)
 const notice = ref('')
 const dates = ref([])
 const timePeriods = ref([])
 const availableHoursHidden = ref(true)
 const workingTime = {start: '09:00', end: '23:59'}
+const workingHours = ref(null)
 const startHour = +workingTime.start.split(':')[0]
 const endHour = +workingTime.end.split(':')[0]
 const form = ref({
-    name: '',
+    name: '1234',
     phone: '+7',
     address: 'Россия, Челябинск, ',
-    payment_type: '',
-    date: '',
-    time: '',
-    comment: '',
-    order: {}
+    payment_method: '',
+    delivery_time: '',
+    cart: {}
 })
 const weekdays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
 const availableHours = ref([])
@@ -133,24 +134,41 @@ const submitHidden = ref(true)
 const error = ref({})
 const addressInput = ref(null)
 const yMap = ref(null)
+let pickedDate = null
 
 const phoneRegularExp = /(\+7|8)[\s(]?(\d{3})[\s)]?(\d{3})[\s-]?(\d{2})[\s-]?(\d{2})/g;
 
+const pluralizedGoods = computed(() => {
+    return pluralize(itemsInCart.value.amount)
+})
+
 const handlePickedDate = (date, i) => {
+    pickedDate = date
     activeDate.value = i
-    form.value.date = date
+    form.value.delivery_time = pickedDate
+    form.value.delivery_time.setHours(0, 0, 0, 0)
     setAvailableHours(date)
+    form.value.delivery_time = formatTimeForSQL(date)
 }
 
-const handleHours = (hour, i) => {
+const handleHours = (date, i) => {
     activeHour.value = i
     paymentHidden.value = false
-    form.value.time = hour
+
+    form.value.delivery_time = formatTimeForSQL(date)
+}
+
+const formatTimeForSQL = (time) => {
+    // format to '2022-08-16 00:59:50'
+    let right = time.toLocaleString().slice(12, time.toLocaleString().length)
+    let left = time.toISOString().slice(0, 10)
+
+    return left + " " + right
 }
 
 const handlePayment = (payment) => {
     activePayment.value = payment
-    form.value.payment_type = payment
+    form.value.payment_method = payment
     submitHidden.value = false
 }
 
@@ -161,25 +179,56 @@ const setDates = () => {
     for (let i = 0; i < 14; i++) {
         dates.value.push(new Date(currDate.setDate(first + i)))
     }
+    let arr = []
+    dates.value.forEach(date => {
+        // console.log(date)
+        let closes = new Date(workingHours.value.opens_at)
+        // console.log(date > closes)
+        arr.push({date, available: date > closes})
+    })
+    dates.value = arr
+    // console.log(dates.value)
 }
 
-const setAvailableHours = (date) => {
-    availableHours.value = []
-    availableHoursHidden.value = false
+const setAvailableHours = () => {
     let currDate = new Date()
-    let availableStartHour
-    let hours
+    availableHours.value = []
+    let opens = new Date(workingHours.value.opens_at)
+    let closes = new Date(workingHours.value.closes_at)
+    let hours = Math.ceil((closes - opens) / 60 / 60 / 1000)
 
-    hours = (endHour /* +1 if time set 23:59 */ - startHour)
-    availableStartHour = startHour
+    availableHoursHidden.value = false
 
-    if (currDate.getDate() === date.getDate() && currDate.getHours() > startHour + 1) {
-        hours = (endHour /* +1 if time set 23:59 */ - startHour) - (currDate.getHours() - startHour + 1)
-        availableStartHour = currDate.getHours() + 1
+    // let startDate =  new Date(date.getTime() + parseInt(workingHours.value.opens_at.slice(0, 2), 10) * 60 * 60 * 1000)
+    // let endDate =  new Date(date.getTime() + parseInt(workingHours.value.closes_at.slice(0, 2), 10) * 60 * 60 * 1000)
+
+    // console.log(startDate, endDate)
+    // let currDate = new Date()
+    // let availableStartHour
+    // let hours
+    //
+    // hours = (endHour /* +1 if time set 23:59 */ - startHour)
+    // availableStartHour = startHour
+    //
+    // if (currDate.getDate() === date.getDate() && currDate.getHours() > startHour + 1) {
+    //     hours = (endHour /* +1 if time set 23:59 */ - startHour) - (currDate.getHours() - startHour + 1)
+    //     availableStartHour = currDate.getHours() + 1
+    // }
+
+    let availableHour
+
+    if (pickedDate < opens) {
+        availableHour = new Date().getHours() + 1
+        hours = Math.ceil((closes - currDate) / 60 / 60 / 1000) - 1
+    }
+    else {
+        availableHour = opens.getHours()
+        hours = Math.ceil((closes - opens) / 60 / 60 / 1000)
     }
 
-    for (let i = 1; i < hours; i++) {
-        availableHours.value.push(availableStartHour + i)
+    for (let i = 1; i < hours - 1; i++) {
+        let date = new Date(pickedDate.setHours(availableHour + i, 0, 0, 0))
+        availableHours.value.push(date)
     }
 }
 
@@ -195,7 +244,6 @@ const formatPhone = (phone) => {
 const checkPhone = () => {
     let err = 'Введён неверный номер телефона'
     let phone = form.value.phone.replace(/[()\s\-]*/g, '')
-    console.log(phone)
     if (phoneRegularExp.test(phone) || /^\+7$/.test(form.value.phone)) {
         form.value.phone = form.value.phone.replace(phoneRegularExp, '+7 ($2) $3-$4-$5')
         error.value.phone = false
@@ -250,7 +298,7 @@ const checkAddress = () => {
     })
 }
 
-const handleSubmit = () => {
+const handleSubmit = async () => {
     if (form.value.name.length < 1) {
         error.value.name = 'Введите имя'
     }
@@ -258,10 +306,16 @@ const handleSubmit = () => {
     if (form.value.phone === '+7' || form.value.phone.length < 5) error.value.phone = 'Введён неверный номер телефона'
 
     let timeHasNotExpired = form.value.time + 1 > new Date().getHours()
-    if (timeHasNotExpired) {
-        form.value.order = localStorage.getItem('cart')
-        console.log(form.value.order)
-    }
+    // if (timeHasNotExpired) {
+    //     form.value.cart = localStorage.getItem('cart')
+    // }
+
+    form.value.cart = localStorage.getItem("cart")
+    console.log(form.value.cart)
+
+    await axios.post('api/order', form.value).then(res => {
+        console.log(res)
+    })
 }
 
 watchEffect(() => {
@@ -278,19 +332,32 @@ watchEffect(() => {
 const availableDates = computed(() => {
     let obj = []
 
+    // console.log(dates.value[1])
+
     dates.value.forEach(date => {
-        date.setHours(endHour - 2)
-        date.setMinutes(endHour)
-        obj.push({date, available: new Date() < date - 2})
+        // console.log(date)
+        // console.log(new Date(workingHours.value.closes_at))
+        let closes = new Date(workingHours.value.closes_at)
+        let datewnh = date.setHours(0, 0, 0, 0)
+        let gggg = new Date(datewnh)
+        // console.log(gggg > closes.setHours(closes.getHours() - 2))
+        // console.log(datewnh > closes.setHours(closes.getHours() - 2))
+        // date.setHours(endHour - 2)
+        // date.setMinutes(endHour)
+        let r = date.getTime() > closes.setHours(closes.getHours() - 2)
+        obj.push({date, available: false})
     })
 
     return obj
 })
 
-onMounted(() => {
+onMounted(async () => {
     ymaps.ready(() => {
         yMap.value = new ymaps.SuggestView('inputAddress')
     })
+
+    let res = await axios.get(`api/opening-hours/`)
+    workingHours.value = res.data
 
     setDates()
 })

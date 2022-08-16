@@ -6,7 +6,7 @@
                     <img class="w-20 ml-0.5" :src="require(`@/assets/svg/logo.svg`)" alt="">
                 </router-link>
 
-                <div class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
+                <div v-if="!user" class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
                     <router-link class="mr-12" to="/#bouquets">Букеты</router-link>
                     <router-link class="mr-12" to="/#about">О нас</router-link>
                     <div class="border-r-2 mr-12 h-8 border-gray-150"></div>
@@ -28,6 +28,13 @@
                             </div>
                         </router-link>
                     <router-link :to="{ name: 'Cart' }"></router-link>
+                </div>
+
+                <div v-else class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
+                    <router-link class="mr-12" :to="`/${user.role}/orders`">Заказы</router-link>
+                    <router-link class="mr-12" to="/#bouquets">Товары</router-link>
+                    <router-link v-if="user.role === 'admin'" to="/#bouquets">Сотрудники</router-link>
+<!--                    <div class="cursor-pointer" @click="handleLogout">Выйти</div>-->
                 </div>
 
                 <div v-show="!isClicked" @click="handeClick"
@@ -141,8 +148,19 @@
             </div>
         </div>
 
-        <!-- All Rights -->
-        <div class="flex justify-center mb-16 text-gray-400 text-sm">© 2022 Florets, все права защищены.</div>
+        <!-- All Rights & Login -->
+        <div class="flex md:flex-row mx-6 flex-col justify-center mb-16 text-gray-400 text-sm">
+            <div class="mr-1">© 2022 Florets, все права защищены.</div>
+
+            <router-link v-if="!user" class="underline" :to="{ name: 'Login' }">
+                Войти как сотрудник
+            </router-link>
+
+            <div v-else>
+                Вы вошли как&nbsp;{{ user.name }}. <span class="cursor-pointer underline" @click="handleLogout">Выйти</span>
+            </div>
+
+        </div>
 
         <!-- mobile menu -->
         <transition
@@ -177,19 +195,29 @@
 </template>
 
 <script setup>
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, watchEffect } from "vue";
 import { useStore } from 'vuex'
 import { formatPrice } from "@/functions";
+import useAuth from "@/composables/useAuth";
+import { useRouter } from "vue-router";
 
 // let isClicked = false
 let isClicked = ref(false)
+
+const { error, fetchUser, logout } = useAuth()
 const store = useStore()
+const router = useRouter()
 
 const handeClick = () => {
     isClicked.value = !isClicked.value
 }
 
-const itemsInCart = computed(() => store.state.cart)
+const routeByRole = () => {
+    user.value.role === 'admin' ? router.push({ name: 'Admin' }) : router.push({ name: 'Employee' })
+}
+
+const itemsInCart = computed(() => store.state.cart.items)
+const user = computed(() => store.getters.getUser)
 
 const setItemsInCart = () => {
     let cart = JSON.parse(localStorage.getItem("cart")) || []
@@ -200,10 +228,21 @@ const setItemsInCart = () => {
         return acc
     }, {price: 0, amount: 0})
 
-    store.dispatch('setCart', {amount: cartItems.amount, price: cartItems.price})
+    store.dispatch('setCart', { amount: cartItems.amount, price: cartItems.price })
+}
+
+const handleLogout = () => {
+    logout()
+    router.push('/')
 }
 
 onMounted(() => {
+    fetchUser()
+            .then(res => store.dispatch('setUser', res.data))
+            .catch(err => {
+                //
+            })
+
     setItemsInCart()
 })
 </script>

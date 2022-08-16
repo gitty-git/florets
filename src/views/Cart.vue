@@ -65,7 +65,7 @@
         <div v-if="products.length" class="flex justify-end md:mt-12 mt-6 md:text-2xl">
             <span class="text-gray-400">Итого:
             </span>&nbsp;<span class="font-medium">{{ productAmount }}</span>
-            &nbsp;{{ pluralized }} на сумму&nbsp;
+            &nbsp;{{ pluralizedGoods }} на сумму&nbsp;
             <span class="font-medium">{{ formatPrice(total) }}</span>&nbsp;₽.
         </div>
 
@@ -85,17 +85,15 @@
 
 <script setup>
 import { computed, onMounted, ref, watchEffect } from "vue";
-import { formatPrice } from "@/functions";
+import { formatPrice, pluralize } from "@/functions";
 import { store } from "@/store";
 
 const products = ref([])
 const productAmount = ref(0)
 const total = ref(0)
 
-const pluralized = computed(() => {
-    if (/^1$|^[2-9]1$/.test(productAmount.value.toString())) return 'товар'
-    if(/^[2-4]$|^[2-9][2-4]$/.test(productAmount.value.toString())) return 'товара'
-    else return 'товаров'
+const pluralizedGoods = computed(() => {
+    return pluralize(productAmount.value)
 })
 
 const removeProduct = (id) => {

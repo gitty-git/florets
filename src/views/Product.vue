@@ -1,5 +1,5 @@
 <template>
-    <div class="px-6 m-0 lg:pt-16 pt-12 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
+    <div v-if="product" class="px-6 m-0 lg:pt-16 pt-12 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
         <div class="lg:w-1/2 w-full mb-12 sm:flex-row flex-col flex justify-between">
             <img class="mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="require(`@/assets/images/b-${product.img}.png`)" alt="">
 
@@ -15,7 +15,7 @@
             <div>
                 <div class="flex">
                     <div class="font-display text-2xl lg:text-4xl">
-                        Название букета
+                        {{ product.name }}
                     </div>
                     <div class="text-sm mt-1.5 ml-4">⌀ {{ product.size }} см</div>
                 </div>
@@ -26,7 +26,7 @@
             </div>
 
             <div class="leading-loose mt-12 font-serif text-gray-500">
-                Многие думают, что Lorem Ipsum - взятый с потолка псевдо-латинский набор слов, но это не совсем так. Его корни уходят в один фрагмент классической латыни 45 года н.э., то есть более двух тысячелетий назад. Ричард МакКлинток, профессор латыни из колледжа
+                {{ product.description }}
             </div>
 
             <div class="flex sm:flex-row flex-col w-full mt-12 uppercase">
@@ -81,6 +81,7 @@ import { useRoute } from "vue-router";
 import { products } from "@/products";
 import { useStore } from 'vuex'
 import { formatPrice } from "@/functions";
+import axios from "axios";
 
 const store = useStore()
 
@@ -107,10 +108,10 @@ const getLocalProducts = () => {
 }
 
 const addProduct = () => {
-    const item = products.find(p => p.id === route.params.id)
+    // const item = products.find(p => p.id === route.params.id)
 
     alreadyInCart.value = true
-    cart.value.push({...item, amount: amount.value})
+    cart.value.push({...product.value, amount: amount.value})
 
     updateCart()
 }
@@ -120,7 +121,7 @@ const updateCart = () => {
         acc.price += price * amount
         acc.amount += amount
         return acc
-    }, {price: 0, amount: 0})
+    }, { price: 0, amount: 0 })
 
     store.dispatch('setCart', {amount: cartItems.amount, price: cartItems.price})
     localStorage.setItem("cart", JSON.stringify(cart.value))
@@ -135,14 +136,14 @@ const checkProductInCart = () => {
     }
 }
 
-onBeforeMount(() => {
-    product.value = products.find(p => p.id === route.params.id)
+onBeforeMount(async () => {
+    let res = await axios.get(`api/products/${route.params.id}`)
+    product.value = res.data
+    checkProductInCart()
 })
 
 onMounted(() => {
-
     cart.value = JSON.parse(localStorage.getItem("cart")) || []
-    checkProductInCart()
 })
 </script>
 
