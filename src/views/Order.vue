@@ -67,7 +67,7 @@
                 <div class="mt-6 grid font-medium grid-cols-2 sm:grid-cols-4 gap-3">
                     <div v-for="(date, i) in availableHours" :key="i"
                     >
-                        <div :class="{'border-mainRed text-mainRed': i === activeHour}" @click="handleHours(date, i)"
+                        <div :class="{'border-mainRed text-mainRed': date.getHours() === activeHour}" @click="handleHours(date, i)"
                              class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 flex justify-center">
                             {{ date.getHours() }}:00 - {{ date.getHours() + 2 === 24 ? '00' : date.getHours() + 2 }}:00
                         </div>
@@ -149,13 +149,15 @@ const handlePickedDate = (date, i) => {
     form.value.delivery_time.setHours(0, 0, 0, 0)
     setAvailableHours(date)
     form.value.delivery_time = formatTimeForSQL(date)
+    console.log(form.value.delivery_time)
 }
 
-const handleHours = (date, i) => {
-    activeHour.value = i
+const handleHours = (date) => {
+    activeHour.value = date.getHours()
     paymentHidden.value = false
 
     form.value.delivery_time = formatTimeForSQL(date)
+    console.log(form.value.delivery_time)
 }
 
 const formatTimeForSQL = (time) => {
@@ -163,7 +165,7 @@ const formatTimeForSQL = (time) => {
     let right = time.toLocaleString().slice(12, time.toLocaleString().length)
     let left = time.toISOString().slice(0, 10)
 
-    return left + " " + right
+    return left + ' ' + right
 }
 
 const handlePayment = (payment) => {
@@ -179,42 +181,23 @@ const setDates = () => {
     for (let i = 0; i < 14; i++) {
         dates.value.push(new Date(currDate.setDate(first + i)))
     }
+
     let arr = []
     dates.value.forEach(date => {
-        // console.log(date)
         let closes = new Date(workingHours.value.opens_at)
-        // console.log(date > closes)
         arr.push({date, available: date > closes})
     })
     dates.value = arr
-    // console.log(dates.value)
 }
 
 const setAvailableHours = () => {
-    let currDate = new Date()
     availableHours.value = []
-    let opens = new Date(workingHours.value.opens_at)
-    let closes = new Date(workingHours.value.closes_at)
-    let hours = Math.ceil((closes - opens) / 60 / 60 / 1000)
-
     availableHoursHidden.value = false
 
-    // let startDate =  new Date(date.getTime() + parseInt(workingHours.value.opens_at.slice(0, 2), 10) * 60 * 60 * 1000)
-    // let endDate =  new Date(date.getTime() + parseInt(workingHours.value.closes_at.slice(0, 2), 10) * 60 * 60 * 1000)
-
-    // console.log(startDate, endDate)
-    // let currDate = new Date()
-    // let availableStartHour
-    // let hours
-    //
-    // hours = (endHour /* +1 if time set 23:59 */ - startHour)
-    // availableStartHour = startHour
-    //
-    // if (currDate.getDate() === date.getDate() && currDate.getHours() > startHour + 1) {
-    //     hours = (endHour /* +1 if time set 23:59 */ - startHour) - (currDate.getHours() - startHour + 1)
-    //     availableStartHour = currDate.getHours() + 1
-    // }
-
+    let currDate = new Date()
+    let opens = new Date(workingHours.value.opens_at)
+    let closes = new Date(workingHours.value.closes_at)
+    let hours
     let availableHour
 
     if (pickedDate < opens) {
@@ -327,28 +310,6 @@ watchEffect(() => {
     if (!cond) {
         form.value.address = 'Россия, Челябинск, '
     }
-})
-
-const availableDates = computed(() => {
-    let obj = []
-
-    // console.log(dates.value[1])
-
-    dates.value.forEach(date => {
-        // console.log(date)
-        // console.log(new Date(workingHours.value.closes_at))
-        let closes = new Date(workingHours.value.closes_at)
-        let datewnh = date.setHours(0, 0, 0, 0)
-        let gggg = new Date(datewnh)
-        // console.log(gggg > closes.setHours(closes.getHours() - 2))
-        // console.log(datewnh > closes.setHours(closes.getHours() - 2))
-        // date.setHours(endHour - 2)
-        // date.setMinutes(endHour)
-        let r = date.getTime() > closes.setHours(closes.getHours() - 2)
-        obj.push({date, available: false})
-    })
-
-    return obj
 })
 
 onMounted(async () => {

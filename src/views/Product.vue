@@ -69,7 +69,7 @@
             </div>
 
             <div class="text-sm text-gray-400 mt-12">
-                <span class="text-black font-medium">ID продукта:</span> {{ product.id }}
+                <span class="text-black font-medium">ID продукта:</span> {{ product.id.toUpperCase() }}
             </div>
         </div>
     </div>
