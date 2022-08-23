@@ -61,6 +61,12 @@ const routes = [
         name: 'ViewOrder',
         component: () => import('../views/dashboard/ViewOrder')
     },
+    {
+        path:'/thanks-for-the-order/:orderId',
+        name: 'ThanksForTheOrder',
+        component: () => import('../views/ThanksForTheOrder'),
+        props: true
+    },
 ]
 
 const router = createRouter({

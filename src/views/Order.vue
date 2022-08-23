@@ -88,6 +88,8 @@
                 </div>
             </div>
 
+            <div class="w-full left-0 absolute mt-6 text-sm flex justify-center text-mainRed">{{ expiredTimeErr }}</div>
+
             <!-- submit -->
             <div v-if="!submitHidden" class="w-full flex mt-16 justify-center" >
                 <div @click="handleSubmit" class="btn">
@@ -102,8 +104,9 @@
 import Input from "@/components/Input";
 import { computed, onMounted, ref, watchEffect } from "vue";
 import { useStore } from 'vuex'
-import { formatPrice, pluralize } from '@/functions'
+import { formatPrice, formatTime, pluralize } from '@/functions'
 import axios from "axios";
+import { useRouter } from "vue-router";
 
 const store = useStore()
 
@@ -134,7 +137,11 @@ const submitHidden = ref(true)
 const error = ref({})
 const addressInput = ref(null)
 const yMap = ref(null)
+const expiredTimeErr = ref(null)
+
 let pickedDate = null
+
+const router = useRouter()
 
 const phoneRegularExp = /(\+7|8)[\s(]?(\d{3})[\s)]?(\d{3})[\s-]?(\d{2})[\s-]?(\d{2})/g;
 
@@ -148,24 +155,12 @@ const handlePickedDate = (date, i) => {
     form.value.delivery_time = pickedDate
     form.value.delivery_time.setHours(0, 0, 0, 0)
     setAvailableHours(date)
-    form.value.delivery_time = formatTimeForSQL(date)
-    console.log(form.value.delivery_time)
 }
 
 const handleHours = (date) => {
     activeHour.value = date.getHours()
+    form.value.delivery_time = date
     paymentHidden.value = false
-
-    form.value.delivery_time = formatTimeForSQL(date)
-    console.log(form.value.delivery_time)
-}
-
-const formatTimeForSQL = (time) => {
-    // format to '2022-08-16 00:59:50'
-    let right = time.toLocaleString().slice(12, time.toLocaleString().length)
-    let left = time.toISOString().slice(0, 10)
-
-    return left + ' ' + right
 }
 
 const handlePayment = (payment) => {
@@ -177,6 +172,8 @@ const handlePayment = (payment) => {
 const setDates = () => {
     let currDate = new Date
     let first = currDate.getDate() - currDate.getDay() + 1
+    let opens = new Date(workingHours.value.opens_at)
+    let closes = new Date(workingHours.value.closes_at)
 
     for (let i = 0; i < 14; i++) {
         dates.value.push(new Date(currDate.setDate(first + i)))
@@ -184,8 +181,8 @@ const setDates = () => {
 
     let arr = []
     dates.value.forEach(date => {
-        let closes = new Date(workingHours.value.opens_at)
-        arr.push({date, available: date > closes})
+        let sameDates = date.getDate() === closes.getDate()
+        arr.push({date, available: (date > closes || sameDates)})
     })
     dates.value = arr
 }
@@ -235,15 +232,27 @@ const checkPhone = () => {
     else error.value.phone = err
 }
 
-const handleAddressInput = () => {
+const handleAddressInput = async () => {
     form.value.address = addressInput.value.value
-    checkAddress()
+    error.value.address = await checkAddress()
 }
 
-const checkAddress = () => {
-    ymaps.geocode(form.value.address).then(function (res) {
-        let obj = res.geoObjects.get(0),
-                err, hint;
+const checkIfChosenTimeHasExpired = () => {
+    const chosenDate = form.value.delivery_time
+
+    const chosenHourPlus = chosenDate.getHours() - 1
+    const datesAreTheSame = chosenDate.getDate() === new Date().getDate()
+    const currHour = new Date().getHours() + 1
+
+    return datesAreTheSame && chosenHourPlus < currHour
+}
+
+const checkAddress = async () => {
+    let err
+    let hint
+
+    await ymaps.geocode(form.value.address).then(function (res) {
+        let obj = res.geoObjects.get(0)
 
         if (obj) {
             // Об оценке точности ответа геокодера можно прочитать тут: https://tech.yandex.ru/maps/doc/geocoder/desc/reference/precision-docpage/
@@ -272,13 +281,13 @@ const checkAddress = () => {
 
         // Если геокодер возвращает пустой массив или неточный результат, то показываем ошибку.
         if (err) {
-            error.value.address = err
+            return err
         } else {
-            error.value.address = false
-            // console.log(obj);
+            return null
         }
-    }, function (e) {
     })
+
+    return err
 }
 
 const handleSubmit = async () => {
@@ -286,18 +295,41 @@ const handleSubmit = async () => {
         error.value.name = 'Введите имя'
     }
 
-    if (form.value.phone === '+7' || form.value.phone.length < 5) error.value.phone = 'Введён неверный номер телефона'
+    if (form.value.phone === '+7' || form.value.phone.length < 5) {
+        error.value.phone = 'Введён неверный номер телефона'
+    }
 
-    let timeHasNotExpired = form.value.time + 1 > new Date().getHours()
-    // if (timeHasNotExpired) {
-    //     form.value.cart = localStorage.getItem('cart')
-    // }
+    error.value.address = await checkAddress()
+
+    if (error.value.phone || error.value.address || error.value.name) {
+        window.scrollTo({ top: 150, behavior: 'smooth' });
+        return
+    }
+
+    if (checkIfChosenTimeHasExpired()) {
+        expiredTimeErr.value = 'Выбранный временной промежуток уже не достуступен.'
+
+        form.value.delivery_time = pickedDate
+        form.value.delivery_time.setHours(0, 0, 0, 0)
+
+        setAvailableHours()
+
+        return
+    }
 
     form.value.cart = localStorage.getItem("cart")
-    console.log(form.value.cart)
+    form.value.delivery_time = formatTime(form.value.delivery_time)
+    console.log(form.value.delivery_time)
 
     await axios.post('api/order', form.value).then(res => {
-        console.log(res)
+        router.push({ name: 'ThanksForTheOrder', params: {
+            orderId: res.data.id,
+            name: form.value.name,
+            phone: form.value.phone
+        }})
+
+        store.dispatch('setCart', {amount: 0, price: 0})
+        localStorage.removeItem("cart")
     })
 }
 

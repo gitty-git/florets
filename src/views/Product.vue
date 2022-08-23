@@ -29,8 +29,8 @@
                 {{ product.description }}
             </div>
 
-            <div class="flex sm:flex-row flex-col w-full mt-12 uppercase">
-                <div v-if="!alreadyInCart" class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 sm:border-r-0 border-r-2 h-16">
+            <div class="flex xl:flex-row flex-col w-full mt-12 uppercase">
+                <div v-if="!alreadyInCart" class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 xl:border-r-0 border-r-2 h-16">
                     <div class="text-gray-500 ml-10 text-xs">Количество:</div>
 
                     <div class="flex justify-between items-center text-black font-bold mx-6">
@@ -46,7 +46,7 @@
                     </div>
                 </div>
 
-                <div class="sm:mt-0 mt-6 duration-150 w-2/3 sm:w-96 font-bold text-xs uppercase">
+                <div class="xl:mt-0 mt-6 duration-150 w-2/3 xl:w-96 font-bold text-xs uppercase">
                     <router-link class="text-mainRed flex border-2 h-16 flex justify-center border-opacity-20 items-center border-mainRed "
                                  v-if="alreadyInCart"
                                  :to="{name: 'Cart'}"
@@ -88,7 +88,7 @@ const store = useStore()
 const amount = ref(1)
 const alreadyInCart = ref(false)
 const route = useRoute()
-const product = ref({})
+const product = ref(null)
 const cart = ref([])
 
 const increase = () => {
@@ -138,7 +138,7 @@ const checkProductInCart = () => {
 
 onBeforeMount(async () => {
     let res = await axios.get(`api/products/${route.params.id}`)
-    product.value = res.data
+    product.value = res.data[0]
     checkProductInCart()
 })
 

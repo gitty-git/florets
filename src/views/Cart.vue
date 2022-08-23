@@ -139,7 +139,7 @@ watchEffect(() => {
 })
 
 onMounted(() => {
-    products.value = JSON.parse(localStorage.getItem("cart"))
+    products.value = JSON.parse(localStorage.getItem("cart")) || []
     productAmount.value = products.value.length || 0
 
     // productAmount.value = products.value.length

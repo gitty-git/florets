@@ -1,16 +1,17 @@
 <template>
     <div class="text-xs text-gray-400 uppercase mt-12">Добавить товар - поиск по названию/ID:</div>
-    <input class="input" type="text" v-model="finder" @click="search" @keyup="search">
-<!--    <button @click="search">Поиск</button>-->
+    <input class="input z-50 relative" type="text"
+           v-model="finder" @click="search" @keyup="search"
+           @keyup.esc="showed = false; finder = null"
+    >
 
-    <div class="relative" v-if="showed === true">
+    <div class="relative z-50" v-if="showed === true">
         <div v-if="products" class="shadow-md bg-white absolute w-full">
             <div v-for="product in products" @click.stop="handleClick(product)"
                  class="w-full items-center flex flex-wrap justify-between cursor-pointer px-6 py-3 duration-100 hover:bg-gray-100">
                 <div class="mr-2">
                     {{ product.name }} - {{ product.size }}см. - {{ product.price }}р.
                 </div>
-<!--                {{ product.inCart }}-->
 
                 <div class="text-xs uppercase text-mainRed" v-show="product.inCart">
                     Этот товар уже в корзине
@@ -18,6 +19,8 @@
             </div>
         </div>
     </div>
+
+    <div v-if="showed" @click="showed = !showed;" class="fixed bg-black w-full h-screen top-0 left-0 opacity-0"></div>
 
 </template>
 
@@ -29,14 +32,14 @@ import axios from "axios";
 //     finder: String
 // })
 const emit = defineEmits(['addProduct'])
-const props = defineProps(['err', 'cart'])
+const props = defineProps(['cart'])
 
-const finder = ref(null)
+const finder = ref('')
 const showed = ref(false)
-const products = ref(null)
+const products = ref([])
 
 const search = async () => {
-    // if (finder.value.length < 3) return
+    if (finder.value.length < 1) return
     showed.value = true
 
     let res = await axios.get(`api/products/${finder.value}`)
@@ -60,6 +63,7 @@ const handleClick = (product) => {
 
     if (!product.inCart) {
         showed.value = false
+        finder.value = null
     }
 }
 

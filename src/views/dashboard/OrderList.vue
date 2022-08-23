@@ -4,20 +4,37 @@
 
         <div class="flex pt-12 flex-wrap">
             <div class="mr-6 text-gray-400 mb-4 text-sm uppercase cursor-pointer"
-                 :class="{'text-mainRed underline' : activeCategory === id }"
-                 @click="fetchByStatus(status)"
-                 v-for="(status, id) in statuses">
-                {{ status }}
+                 :class="{'text-mainRed underline' : activeCategory === status.eng }"
+                 @click="fetchByStatus(status, id)"
+                 v-for="(status, id) in categoryStatus">
+                {{ status.ru }}
             </div>
         </div>
 
-        <div v-if="orders" class="cursor-pointer" v-for="order in computedOrders" @click="showOrderModal(order.id)">
-            <table class="table-auto mb-6">
-                {{ order.name }}
-                {{ order.created_at }}
-            </table>
+        <!-- list -->
+        <div class="my-6">
+            <div class="flex text-gray-400 uppercase text-xs w-full mb-3">
+                <div class="w-1/2 mr-4">Имя</div>
+                <div class="w-1/4 mx-2">Создан</div>
+                <div class="w-1/4 mx-2">Статус</div>
+            </div>
+
+            <div v-if="orders" class="cursor-pointer sm:text-base text-sm border-gray-150 border-t-2 flex py-6"
+                 v-for="order in computedOrders" @click="showOrderModal(order.id)"
+            >
+                <div class="w-1/2 mr-2">
+                    {{ order.name }}
+                </div>
+                <div class="w-1/4 mr-2">
+                    {{ order.created_at }}
+                </div>
+                <div class="w-1/4">
+                    {{ translateStatuses(order.status).ru }}
+                </div>
+            </div>
         </div>
 
+        <!-- pagination -->
         <div v-if="orders" class="flex justify-center items-center">
             <div @click="prevPage"
                  class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
@@ -34,7 +51,7 @@
             </div>
         </div>
 
-        <OrderModal @modalHidden="showOrderModal" :modalHidden="modalHidden" v-if="!modalHidden" :orderId="orderId"/>
+        <OrderModal @modalHidden="showOrderModal" @order="updateOrders" :modalHidden="modalHidden" v-if="!modalHidden" :orderId="orderId"/>
     </div>
 </template>
 
@@ -43,6 +60,7 @@ import { computed, onMounted, ref } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";
 import OrderModal from "@/components/OrderModal"
+import { translateStatuses } from "@/functions";
 
 const store = useStore()
 
@@ -52,32 +70,28 @@ const orderId = ref(null)
 const modalHidden = ref(true)
 const activeCategory = ref('all')
 const total = ref(0)
-const statuses = ref({
-    all: "Все",
-    created: "Новые",
-    processed: "Обработанные",
-    sent: "Отправленные",
-    received: "Полученные",
-})
-// const statuses = ref(["Все", "Новые", "Обработанные", "Отправленные", "Полученные"])
+const rawStatuses = ref(["created", "processed", "sent", "received", "canceled",])
+
+const categoryStatus = ref([])
+
+const updateOrders = (order) => {
+    let foundOrder = orders.value.data.find(o => o.id === order.id)
+    foundOrder.status = order.status
+    foundOrder.name = order.name
+}
 
 const fetchByStatus = async (status) => {
-    for (const key in statuses.value) {
-        if (status === statuses.value[key]) {
-            status = key
-        }
-    }
-
-    let res = await axios.get(`api/orders/${status}`)
+    let res = await axios.get(`api/orders/${status.eng}`)
     orders.value = res.data
-    activeCategory.value = status
+    activeCategory.value = status.eng
 }
 
 const computedOrders = computed(() => {
     orders.value.data.map(order => {
         let date = new Date(order.created_at)
-        order.created_at = `${date.getDate()}.${date.getMonth()} | ${date.getHours()}:${date.getMinutes()}`
+        order.created_at = `${date.getDate()}/${date.getMonth()} ${date.getHours()}:${date.getMinutes()}`
     })
+
     return orders.value.data
 })
 
@@ -85,10 +99,6 @@ const showOrderModal = (id) => {
     modalHidden.value = !modalHidden.value
     orderId.value = id
 }
-
-// const computedOrders = () => {
-//
-// }
 
 const nextPage = async () => {
     let res = await axios.get(orders.value.next_page_url)
@@ -101,18 +111,12 @@ const prevPage = async () => {
 }
 
 onMounted(async () => {
+    categoryStatus.value = [...translateStatuses(['all', ...rawStatuses.value], true)]
+
     let res = await axios.get(`api/orders/all`)
     orders.value = res.data
 
     user.value = store.getters.getUser
-
-    // orders.value.map(order => {
-    //     console.log(order)
-    //     // let total = order.value.reduce((acc, v) => {
-    //     //     return acc + v.item.price * v.amount
-    //     // }, 0)
-    // })
-    // total.value =
 })
 </script>
 
