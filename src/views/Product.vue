@@ -1,13 +1,15 @@
 <template>
     <div v-if="product" class="px-6 m-0 lg:pt-16 pt-12 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
         <div class="lg:w-1/2 w-full mb-12 sm:flex-row flex-col flex justify-between">
-            <img class="mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="require(`@/assets/images/b-${product.img}.png`)" alt="">
+            <img class="mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="mainImage" alt="">
 
             <div class="sm:w-1/6 sm:flex sm:flex-col grid grid-cols-4 gap-x-6 items-stretch justify-between">
-                <img class="sm:mr-0 hover:scale-105 cursor-pointer duration-150" :src="require(`@/assets/images/product-sm.png`)" alt="">
-                <img class="sm:mr-0 hover:scale-105 cursor-pointer duration-150" :src="require(`@/assets/images/product-sm.png`)" alt="">
-                <img class="sm:mr-0 hover:scale-105 cursor-pointer duration-150" :src="require(`@/assets/images/product-sm.png`)" alt="">
-                <img class="sm:mr-0 hover:scale-105 cursor-pointer duration-150" :src="require(`@/assets/images/product-sm.png`)" alt="">
+<!--                <img class="sm:mr-0 hover:scale-105 cursor-pointer duration-150" :src="product.main_image" alt="">-->
+                <img v-for="(image, key) in images" :key="key"
+                     class="sm:mr-0 hover:scale-105 cursor-pointer duration-150"
+                     :src="image" alt=""
+                     @click="mainImage = image"
+                >
             </div>
         </div>
 
@@ -29,9 +31,14 @@
                 {{ product.description }}
             </div>
 
-            <div class="flex xl:flex-row flex-col w-full mt-12 uppercase">
-                <div v-if="!alreadyInCart" class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 xl:border-r-0 border-r-2 h-16">
-                    <div class="text-gray-500 ml-10 text-xs">Количество:</div>
+            <div :class="{'w-fit' : !alreadyInCart}" class="flex xl:flex-row flex-col xl:w-full mt-12 uppercase">
+                <div v-if="!alreadyInCart"
+                     class="border-t-2 flex items-center justify-center border-gray-150 w-full border-l-2 border-b-2 xl:border-r-0 border-r-2 h-16"
+                >
+
+                    <div class="text-gray-500 ml-6 xl:ml-10 text-xs">
+                        Количество:
+                    </div>
 
                     <div class="flex justify-between items-center text-black font-bold mx-6">
                         <div @click="decrease" class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
@@ -40,7 +47,7 @@
 
                         <div class="mx-4 w-4 flex font-bold justify-center">{{ amount }}</div>
 
-                        <div @click="increase" class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
+                        <div @click="increase" class="xl:mr-0 -mr-4 h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border border-gray-150 rounded-full">
                             <img class="w-2 rotate-180" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                         </div>
                     </div>
@@ -90,6 +97,7 @@ const alreadyInCart = ref(false)
 const route = useRoute()
 const product = ref(null)
 const cart = ref([])
+const mainImage = ref()
 
 const increase = () => {
     if (amount.value < 99) amount.value++
@@ -101,6 +109,10 @@ const decrease = () => {
 
 const formattedPrice = computed(() => {
     return formatPrice(product.value.price)
+})
+
+const images = computed(() => {
+    return [product.value.main_image, ...JSON.parse(product.value.images)]
 })
 
 const getLocalProducts = () => {
@@ -139,11 +151,13 @@ const checkProductInCart = () => {
 onBeforeMount(async () => {
     let res = await axios.get(`api/products/${route.params.id}`)
     product.value = res.data[0]
+    mainImage.value = product.value.main_image
     checkProductInCart()
 })
 
 onMounted(() => {
     cart.value = JSON.parse(localStorage.getItem("cart")) || []
+
 })
 </script>
 

@@ -23,7 +23,7 @@
                                  class="w-1/2 flex items-start lg:items-center lg:flex-row flex-col"
                     >
                         <div class="visible lg:invisible mb-4 absolute uppercase text-sm">{{ product.name }}</div>
-                        <img class="lg:mb-0 w-24 mr-6 lg:mt-0 mt-10" :src="require(`@/assets/images/b-${product.img}.png`)" alt="">
+                        <img class="lg:mb-0 w-24 mr-6 lg:mt-0 mt-10" :src="product.main_image" alt="">
                         <div class="lg:visible lg:static absolute pr-6 invisible uppercase text-sm">{{ product.name }}</div>
                     </router-link>
 

@@ -62,6 +62,16 @@ const routes = [
         component: () => import('../views/dashboard/ViewOrder')
     },
     {
+        path:'/:role/products',
+        name: 'ProductList',
+        component: () => import('../views/dashboard/ProductList')
+    },
+    {
+        path:'/:role/add-product',
+        name: 'AddProduct',
+        component: () => import('../views/dashboard/AddProduct')
+    },
+    {
         path:'/thanks-for-the-order/:orderId',
         name: 'ThanksForTheOrder',
         component: () => import('../views/ThanksForTheOrder'),

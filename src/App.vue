@@ -32,7 +32,7 @@
 
                 <div v-else class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
                     <router-link class="mr-12" :to="`/${user.role}/orders`">Заказы</router-link>
-                    <router-link class="mr-12" to="/#bouquets">Товары</router-link>
+                    <router-link class="mr-12" :to="`/${user.role}/products`">Товары</router-link>
                     <router-link v-if="user.role === 'admin'" to="/#bouquets">Сотрудники</router-link>
 <!--                    <div class="cursor-pointer" @click="handleLogout">Выйти</div>-->
                 </div>
@@ -59,17 +59,19 @@
 
             <div class="w-full flex justify-center -mt-12">
                 <div class="p-5 bg-white rounded-full">
-                    <svg width="45" height="45" viewBox="0 0 27 23" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M6.98425 5.49365C13.3366 8.14002 16.3626 15.464 13.7293 21.8593C7.37694 19.213 4.35091 11.889 6.98425 5.49365V5.49365Z"
-                              fill="#EC0121" stroke="#1D1D1B" stroke-width="0.99"/>
-                        <path d="M13.7177 21.8477C11.0844 15.464 14.0989 8.12842 20.4628 5.48206C23.0961 11.8658 20.0816 19.2014 13.7177 21.8477Z"
-                              fill="#EC0121" stroke="#1D1D1B" stroke-width="0.99"/>
-                        <path d="M17.5176 8.70877C17.3443 8.01236 17.044 6.79364 16.2009 5.52849C15.7043 4.76243 14.3876 3.358 13.7177 2C13.0478 3.358 11.7427 4.76243 11.2345 5.52849C10.3914 6.79364 10.0796 8.01236 9.91788 8.70877C9.91788 8.70877 9.55983 10.1944 9.64068 11.9587C9.83703 16.2184 13.3828 21.3835 13.7177 21.8477C14.9997 20.3621 17.6446 16.8336 17.7948 11.9587C17.8294 10.7516 17.7139 9.66053 17.5176 8.70877V8.70877Z"
-                              fill="#EC0121" stroke="#1D1D1B" stroke-width="0.99"/>
-                        <path d="M26.2376 9.32393C18.0258 8.9409 13.2557 17.8898 13.7755 21.8477C18.0258 21.5692 22.842 19.538 24.3781 15.2666C25.0133 13.6649 24.9209 10.8444 26.2376 9.32393V9.32393Z"
-                              fill="#EC0121" stroke="#1D1D1B" stroke-width="0.99"/>
-                        <path d="M1.22095 9.32393C9.43279 8.9409 14.2028 17.8898 13.6831 21.8477C9.43279 21.5692 4.61656 19.538 3.08045 15.2666C2.44522 13.6649 2.53761 10.8444 1.22095 9.32393V9.32393Z"
-                              fill="#EC0121" stroke="#1D1D1B" stroke-width="0.99"/>
+                    <svg width="45" height="45" viewBox="0 0 45 45" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <g clip-path="url(#clip0_401_660)">
+                            <path d="M11.6404 12.4894C22.2277 16.9 27.271 29.1067 22.8822 39.7655C12.2949 35.355 7.25151 23.1483 11.6404 12.4894Z" fill="#EC0121" stroke="#1D1D1B" stroke-width="1.65"/>
+                            <path d="M22.8628 39.7462C18.474 29.1067 23.4982 16.8807 34.1047 12.4701C38.4935 23.1097 33.4693 35.3357 22.8628 39.7462Z" fill="#EC0121" stroke="#1D1D1B" stroke-width="1.65"/>
+                            <path d="M29.196 17.848C28.9071 16.6873 28.4066 14.6561 27.0015 12.5475C26.1738 11.2707 23.9793 8.93 22.8628 6.66667C21.7463 8.93 19.5712 11.2707 18.7242 12.5475C17.319 14.6561 16.7993 16.6873 16.5298 17.848C16.5298 17.848 15.933 20.324 16.0678 23.2645C16.395 30.364 22.3047 38.9725 22.8628 39.7462C24.9995 37.2702 29.4077 31.3893 29.658 23.2645C29.7157 21.2527 29.5231 19.4342 29.196 17.848Z" fill="#EC0121" stroke="#1D1D1B" stroke-width="1.65"/>
+                            <path d="M43.7293 19.8732C30.043 19.2348 22.0928 34.1497 22.9592 40.7462C30.043 40.282 38.07 36.8967 40.6302 29.7777C41.6888 27.1082 41.5348 22.4073 43.7293 19.8732Z" fill="#EC0121" stroke="#1D1D1B" stroke-width="1.65"/>
+                            <path d="M2.03491 19.8732C15.7213 19.2348 23.6713 34.1497 22.8052 40.7462C15.7213 40.282 7.69426 36.8967 5.13408 29.7777C4.07536 27.1082 4.22935 22.4073 2.03491 19.8732Z" fill="#EC0121" stroke="#1D1D1B" stroke-width="1.65"/>
+                        </g>
+                        <defs>
+                            <clipPath id="clip0_401_660">
+                                <rect width="45" height="45" fill="white"/>
+                            </clipPath>
+                        </defs>
                     </svg>
                 </div>
             </div>
@@ -159,20 +161,34 @@
                 leave-from-class="opacity-100"
                 leave-to-class="transform opacity-0"
         >
-            <div v-show="isClicked"
+            <div v-if="isClicked"
                  class="blurred shadow-md fixed w-full py-24 top-0 right-0 text-2xl flex flex-col items-center">
                 <div class="mb-12 p-4 font-black" @click="isClicked = !isClicked">&#9587;</div>
 
-                <div @click.stop="isClicked = !isClicked" class="mb-12">
+                <!-- if no user -->
+                <div v-if="!user" @click.stop="isClicked = !isClicked" class="mb-12">
                     <router-link to="/#bouquets">Букеты</router-link>
                 </div>
 
-                <div @click.stop="isClicked = !isClicked" class="mb-12">
+                <div v-if="!user" @click.stop="isClicked = !isClicked" class="mb-12">
                     <router-link to="/#about">О нас</router-link>
                 </div>
 
-                <div @click.stop="isClicked = !isClicked">
+                <div v-if="!user" @click.stop="isClicked = !isClicked">
                     <router-link :to="{ name: 'Cart' }">Корзина ({{ formatPrice(itemsInCart.price) }} ₽)</router-link>
+                </div>
+
+                <!-- if user -->
+                <div v-if="user" @click.stop="isClicked = !isClicked" class="mb-12">
+                    <router-link :to="`/${user.role}/orders`">Заказы</router-link>
+                </div>
+
+                <div v-if="user" @click.stop="isClicked = !isClicked" class="mb-12">
+                    <router-link :to="`/${user.role}/products`">Товары</router-link>
+                </div>
+
+                <div v-if="user" @click.stop="isClicked = !isClicked">
+                    <router-link v-if="user.role === 'admin'" to="/#bouquets">Сотрудники</router-link>
                 </div>
             </div>
         </Transition>

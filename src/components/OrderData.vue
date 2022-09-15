@@ -3,7 +3,7 @@
         <!-- id -->
         <div class="w-full flex lg:flex-row flex-col lg:mb-2 mb-6">
             <div class="w-1/3 text-sm md:text-md text-gray-400 mr-6 lg:py-2 lg:my-1">ID:</div>
-            <div class="lg:py-2 my-1 py-1 flex">{{ order.id }}</div>
+            <div class="lg:py-2 my-1 py-1 flex uppercase">{{ order.id }}</div>
         </div>
 
         <!-- created_at -->
@@ -34,7 +34,7 @@
         </div>
 
         <!-- payment_method -->
-        <div class="w-full flex lg:flex-row flex-col lg:my-0 lg:my-3 my-6">
+        <div class="w-full flex lg:flex-row flex-col lg:my-0 lg:my-4 my-6">
             <div class="lg:w-1/3 text-sm md:text-md text-gray-400 mr-6 lg:py-2 lg:my-1">
                 Способ оплаты:
             </div>
@@ -48,7 +48,7 @@
         </div>
 
         <!-- paid -->
-        <div class="w-full flex lg:flex-row flex-col lg:my-0 lg:my-3 my-6">
+        <div class="w-full flex lg:flex-row flex-col lg:my-4 my-6">
             <div class="lg:w-1/3 text-sm md:text-md text-gray-400 mr-6 lg:py-2 lg:my-1">
                 Оплачен:
             </div>

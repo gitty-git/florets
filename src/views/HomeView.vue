@@ -99,7 +99,7 @@
             <div class="lg:grid-cols-4 md:grid-cols-2 grid gap-12 lg:px-0 px-6">
                 <div v-for="product in products" :key="product.id">
                     <router-link :to="{ name: 'Product', params: {id: product.id} }">
-                        <Card :pic="product.img" :name="product.name" :price="product.price"/>
+                        <Card :pic="product.main_image" :name="product.name" :price="product.price"/>
                     </router-link>
                 </div>
             </div>
@@ -129,7 +129,7 @@
                     <ul class="leading-loose mt-9">
                         <li class="mt-3">
                             <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-75 absolute"></span>
-                            <span class="sm:ml-0 ml-4">Мы гарантируем, что все наши цветы будут свежими не менее 7 дней.</span>
+                            <span class="sm:ml-0 ml-4">Мы гарантируем, что все наши цветы будут свежими не менее трех дней.</span>
 
                         </li>
 

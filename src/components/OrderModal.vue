@@ -1,8 +1,8 @@
 <template>
-    <div v-if="!modalHidden" class="left-0 flex justify-center items-center w-full">
-        <div v-if="order" class="z-40 bg-white w-full fixed section overflow-scroll h-full sm:left-auto left-0 top-6 xl:w-2/3 md:w-5/6 2xl:w-1/2 bg-white">
-            <div @click="$emit('modalHidden')" class="w-full cursor-pointer flex justify-end p-6">
-                &#9587;
+    <div v-if="!modalHidden" class="left-0 flex justify-center items-center w-full h-full">
+        <div v-if="order" class="z-40 bg-white w-full fixed section overflow-y-scroll sm:left-auto bottom-6 left-0 top-6 xl:w-2/3 md:w-5/6 2xl:w-1/2 bg-white">
+            <div class="w-full flex justify-end">
+                <div @click="$emit('modalHidden')" class="cursor-pointer p-6">&#9587;</div>
             </div>
 
             <div class="sm:px-12 px-3 pb-12 ">
@@ -29,7 +29,7 @@
                                              class="w-1/2 flex items-start lg:items-center lg:flex-row flex-col"
                                 >
                                     <div class="visible lg:invisible mb-4 absolute uppercase text-sm">{{ data.name }}</div>
-                                    <img class="lg:mb-0 w-12 mr-6 lg:mt-0 mt-10" :src="require(`@/assets/images/b-${data.img}.png`)" alt="">
+                                    <img class="lg:mb-0 w-12 mr-6 lg:mt-0 mt-10" :src="data.main_image" alt="">
                                     <div class="lg:visible lg:static absolute pr-6 invisible uppercase text-sm">{{ data.name }}</div>
                                 </a>
 
@@ -80,14 +80,16 @@
 
                 <div class="my-3 text-sm font-medium">Статус заказа:</div>
                 <div class="uppercase mb-6 w-full pb-6 flex text-sm">
-                    <div :class="{'border-b text-mainRed border-mainRed' : status.eng === computedOrder.status}"
+                    <div :class="{'border-b text-mainRed border-mainRed' : status.eng === order.status}"
                          class="mr-2 sm:mr-4 cursor-pointer text-gray-400"
                          v-for="status in translatedStatuses" @click="changeStatus(status)">
                         {{ status.ru }}
                     </div>
                 </div>
 
-                <div class="w-full py-12 justify-center flex">
+                <div class="w-full flex justify-center text-mainRed text-sm">{{ error.message }}</div>
+
+                <div class="w-full py-6 justify-center flex">
                     <div class="btn text-sm" @click="save">Сохранить изменения</div>
                 </div>
 
@@ -105,7 +107,7 @@ import { computed, onMounted, ref, watchEffect } from "vue";
 import axios from "axios";
 import { formatPrice, pluralize, translateStatuses } from "@/functions";
 import OrderData from "@/components/OrderData"
-import AddProductModal from "@/components/AddProductModal"
+import AddProductModal from "@/components/ProductSearchList"
 
 const props = defineProps(['orderId', 'modalHidden'])
 const emits = defineEmits(['modalHidden', 'order'])
@@ -117,19 +119,13 @@ const cart = ref([])
 const rawStatuses = ref([
     'created', 'processed', 'sent', 'received', 'canceled'
 ])
+
 let cachedOrder = {}
 
 const productName = ref('')
 const error = ref({})
-// const nameInput = ref(null)
-
-// const handleInput = () => {
-//     showed.value = !showed.value
-//     nameInput.value.focus()
-// }
 
 const updateOrder = (emittedOrder) => {
-    console.log(emittedOrder)
     order.value = emittedOrder
 }
 
@@ -167,42 +163,24 @@ const decrease = (id) => {
 
 const changeStatus = (status) => {
     cachedOrder.status = order.value.status
-    // status = findStatusKey(status)
     order.value.status = status.eng
-    console.log(cachedOrder.status, order.value.status)
 }
 
 const save = async () => {
     order.value.cart = JSON.stringify(cart.value)
-    console.log(order.value)
+
+    if (!order.value.name || !order.value.phone || !order.value.address) {
+        error.value.message = `Поля "Имя", "Телефон" и "Адрес" обязательны для заполнения`
+    }
+
     let res = await axios.put(`api/orders/${order.value.id}`, order.value)
-    console.log(res)
     emits('modalHidden', false)
     emits('order', order.value)
-
-    // console.log(JSON.stringify(order.value.cart))
-    // order.value.cart = JSON.stringify(order.value.cart)
-    // let localCart = []
-    // order.value.cart.forEach((cart, i) => {
-    //     localCart.push(cart.item)
-    // })
 }
-
-const computedOrder = computed(  () => {
-    // order.value.status = translateStatuses(order.value.status)
-    return order.value
-})
 
 const translatedStatuses = computed(() => {
     return translateStatuses(rawStatuses.value)
 })
-
-// watchEffect(async () => {
-//     if (props.orderId) {
-//         let res = await axios.get(`api/order/${props.orderId}`)
-//         order.value = res.data
-//     }
-// })
 
 const checkIfProductExists = async (item) => {
     let arr = []
@@ -222,18 +200,16 @@ const checkIfProductExists = async (item) => {
 
 const calcTotal = (cart) => {
     return cart.reduce((acc, v) => {
-        return acc + v.price * v.amount
+        if (v.found) {
+            return acc + v.price * v.amount
+        }
+        else return 0
     }, 0)
 }
 
 watchEffect(() => {
     total.value = calcTotal(cart.value)
 })
-
-// watchEffect(() => {
-//     console.log(order.value)
-//     console.log(cachedOrder.value === order.value)
-// })
 
 onMounted(async () => {
     if (props.orderId) {

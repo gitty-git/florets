@@ -9,7 +9,7 @@
             <div class="grid md:grid-cols-2 gap-x-3">
                 <div class="mt-6">
                     <label class="text-sm">Имя:</label>
-                    <input v-model="form.name" class="input" type="text">
+                    <input v-model="form.name" @keyup="nameInput" class="input" type="text">
 
                     <div v-if="error.name" class="text-xs text-mainRed mt-1 absolute">{{ error.name }}</div>
                 </div>
@@ -30,6 +30,14 @@
                 </div>
 
                 <div v-if="error.address" class="text-xs text-mainRed mt-1 absolute">{{ error.address }}</div>
+            </div>
+
+            <!-- comment -->
+            <div class="mt-12">
+                <label class="text-sm">Комментарий к заказу / пожелания в открытке:</label>
+                <div @click="handleAddressInput" @focusout="handleAddressInput" @keyup="handleAddressInput" @input="handleAddressInput">
+                    <textarea v-model="form.comment" rows="3" class="w-full my-2 px-3 py-2 font-serif border-2 border-gray-150" type="text"/>
+                </div>
             </div>
 
             <!-- date -->
@@ -120,11 +128,12 @@ const workingHours = ref(null)
 const startHour = +workingTime.start.split(':')[0]
 const endHour = +workingTime.end.split(':')[0]
 const form = ref({
-    name: '1234',
+    name: '',
     phone: '+7',
     address: 'Россия, Челябинск, ',
     payment_method: '',
     delivery_time: '',
+    comment: '',
     cart: {}
 })
 const weekdays = ['ПН', 'ВТ', 'СР', 'ЧТ', 'ПТ', 'СБ', 'ВС']
@@ -148,6 +157,12 @@ const phoneRegularExp = /(\+7|8)[\s(]?(\d{3})[\s)]?(\d{3})[\s-]?(\d{2})[\s-]?(\d
 const pluralizedGoods = computed(() => {
     return pluralize(itemsInCart.value.amount)
 })
+
+const nameInput = () => {
+    if (form.value.name.length) {
+        error.value.name = null
+    }
+}
 
 const handlePickedDate = (date, i) => {
     pickedDate = date
@@ -182,7 +197,7 @@ const setDates = () => {
     let arr = []
     dates.value.forEach(date => {
         let sameDates = date.getDate() === closes.getDate()
-        arr.push({date, available: (date > closes || sameDates)})
+        arr.push({date, available: (date > closes)})
     })
     dates.value = arr
 }

@@ -1,6 +1,6 @@
 <template>
     <div class="w-full flex flex-col items-center">
-        <img class="mb-4 rounded cursor-pointer hover:scale-102 duration-300" :src="require(`@/assets/images/b-${pic}.png`)" alt="">
+        <img class="mb-4 rounded cursor-pointer hover:scale-102 duration-300" :src="pic" alt="">
         <div class="uppercase mb-1">{{ name }}</div>
         <div class="font-light text-gray-500">{{ formattedPrice }} ₽</div>
     </div>

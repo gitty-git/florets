@@ -1,6 +1,5 @@
 const formatPrice = (price) => {
     return parseInt(price).toLocaleString().replace(',', ' ')
-    // console.log('hello').toLocaleString().replace(',', ' ')
 }
 
 const pluralize = (str) => {
