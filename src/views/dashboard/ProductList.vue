@@ -16,10 +16,27 @@
                 <div class="w-1/4 mr-2">Публичен</div>
             </div>
 
-            <div v-if="products"
-                 v-for="product in products"
+            <div v-if="products" v-for="(product, id) in products"
             >
-                <EditProductModal :product="product"/>
+                <div @click="editProductModal = product.id" class="w-full flex items-center border-t-2 border-gray-150 py-6">
+                    <div class="md:w-1/2 w-1/4 mr-2 md:flex items-center mr-2">
+                        <img class="lg:mb-0 w-12 mr-6 md:mb-0 mb-4" :src="product.main_image" alt="">
+                        {{ product.name }}
+                    </div>
+
+                    <div class="w-1/4 mr-2">
+                        {{ product.price }}
+                    </div>
+
+                    <div class="w-1/4 mr-2">
+                        {{ product.size }}
+                    </div>
+                    <div class="w-1/4 mr-2">
+                        {{ product.published ? 'Да' : 'Нет' }}
+                    </div>
+                </div>
+
+                <EditProductModal @setModal="v => editProductModal = v" :editProductModal="editProductModal" :productId="product.id"/>
             </div>
         </div>
     </div>
@@ -32,6 +49,7 @@ import AddProductModal from '@/components/AddProductModal'
 import EditProductModal from '@/components/EditProductModal'
 
 const products = ref([])
+const editProductModal = ref(false)
 
 onMounted(async () => {
     // await axios.get('/sanctum/csrf-cookie');

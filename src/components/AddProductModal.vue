@@ -1,14 +1,14 @@
 <template>
     <div>
-        <div @click="modalHidden = false"
+        <div @click="addProductModalHidden = false"
              class="w-fit text-sm mt-6 cursor-pointer sm:mt-2 px-3 py-2 rounded border-gray-150 border-2">
             Добавить
         </div>
 
-        <div v-if="!modalHidden" class="absolute left-0 flex justify-center h-full items-center w-full">
+        <div v-if="!addProductModalHidden" class="absolute left-0 flex justify-center h-full items-center w-full">
             <div class="z-40 bg-white w-full fixed section overflow-y-scroll bottom-6 sm:left-auto left-0 top-6 xl:w-2/3 md:w-5/6 2xl:w-1/2 bg-white">
                 <div class="w-full flex justify-end">
-                    <div @click="modalHidden = !modalHidden" class="cursor-pointer p-6">&#9587;</div>
+                    <div @click="addProductModalHidden = !addProductModalHidden" class="cursor-pointer p-6">&#9587;</div>
                 </div>
 
                 <div class="sm:px-12 px-3 pb-12">
@@ -41,7 +41,7 @@
                             <input class="text-sm" type="file" @change="handleMainImage">
 
                             <div class="flex">
-                                <img class="w-16 mr-3 mt-3" :src="mainImageUrl" alt="">
+                                <img @click="removeMainImage" class="w-16 mr-3 mt-3" :src="mainImageUrl" alt="">
                             </div>
 
                             <div class="text-sm text-mainRed">{{ error.mainImage }}</div>
@@ -54,8 +54,8 @@
 
 
                             <div class="flex">
-                                <div v-for="url in imagesUrls">
-                                    <img class="w-16 mr-3 mt-3" :src="url" alt="">
+                                <div v-for="(url, id) in imagesUrls">
+                                    <img @click="removeFromImages(id)" class="w-16 mr-3 mt-3" :src="url" alt="">
                                 </div>
                             </div>
 
@@ -78,8 +78,8 @@
             </div>
         </div>
 
-        <div v-if="!modalHidden" class="left-0 top-0 z-30 fixed w-full h-screen bg-black opacity-25"
-             @click="modalHidden = !modalHidden">
+        <div v-if="!addProductModalHidden" class="left-0 top-0 z-30 fixed w-full h-screen bg-black opacity-25"
+             @click="addProductModalHidden = !addProductModalHidden">
         </div>
     </div>
 
@@ -88,6 +88,7 @@
 <script setup>
 import { ref, watchEffect } from "vue";
 import axios from "axios";
+import { handleImage } from "@/functions";
 
 const form = ref({
     name: 'Product Name',
@@ -102,77 +103,137 @@ const file = ref('')
 const error = ref({})
 const mainImageUrl = ref(null)
 const imagesUrls = ref([])
-const modalHidden = ref(true)
+const addProductModalHidden = ref(true)
+
+// const handleMainImage = async (event) => {
+//     form.value.main_image = event.target.files[0]
+// }
+
+const removeMainImage = () => {
+    mainImageUrl.value = null
+    form.value.main_image = null
+}
 
 const handleMainImage = (event) => {
-    form.value.main_image = event.target.files[0]
+    const reader = new FileReader
+
+    reader.onload = function() {
+        const img = new Image
+
+        img.onload = function() {
+            let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
+            if (!cond) {
+                form.value.main_image = null
+                error.value.mainImage = 'Изображение должно быть в соотношении 4:3'
+            }
+            else {
+                mainImageUrl.value = reader.result
+                form.value.main_image = event.target.files[0]
+                error.value.mainImage = null
+            }
+        }
+        img.src = reader.result
+    }
+    reader.readAsDataURL(event.target.files[0])
+}
+
+const removeFromImages = (item) => {
+    imagesUrls.value.splice(item, 1)
+    images.value.splice(item, 1)
+    console.log(images.value)
 }
 
 const handleImages = (event) => {
     let files = event.target.files
-    if (files.length > 0) {
-        for (let i = 0; i < files.length; i++) {
-            images.value.push(files[i])
+    for (let i = 0; i < files.length; i++) {
+        // images.value.push(files[i])
+        const reader = new FileReader
+
+        reader.onloadend = function() {
+            const img = new Image
+
+            console.log(imagesUrls.value.length)
+
+            img.onload = function() {
+                let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
+                if (!cond) {
+                    error.value.images = 'Изображение должно быть в соотношении 4:3'
+                }
+                else {
+                    imagesUrls.value.push(reader.result)
+                    images.value.push(event.target.files[i])
+                    error.value.images = null
+                }
+            }
+            img.src = reader.result
         }
+        reader.readAsDataURL(event.target.files[i])
     }
 }
 
 watchEffect(() => {
-    if (form.value.main_image instanceof File) {
-        let reader = new FileReader()
-        reader.readAsDataURL(form.value.main_image)
-
-        reader.onload = () => {
-            let image = new Image()
-            image.src = reader.result
-
-            image.onload = function () {
-                let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
-
-                if (!cond) {
-                    error.value.mainImage = 'Изображение должно быть в соотношении 4:3'
-                }
-                else {
-                    error.value.mainImage = null
-                    mainImageUrl.value = reader.result
-                }
-            }
-        }
+    if (imagesUrls.value.length > 3) {
+        error.value.images = 'Максимально 3 шт.'
+        imagesUrls.value.pop()
     }
 })
 
-watchEffect(() => {
-    if (images.value.length > 3) {
-        error.value.images = '3 шт. максимально'
-        return
-    }
+// watchEffect(() => {
+//     if (form.value.main_image instanceof File) {
+//         let reader = new FileReader()
+//         reader.readAsDataURL(form.value.main_image)
+//
+//         reader.onload = () => {
+//             let image = new Image()
+//             image.src = reader.result
+//
+//             image.onload = function () {
+//                 let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
+//
+//                 if (!cond) {
+//                     error.value.mainImage = 'Изображение должно быть в соотношении 4:3'
+//                 }
+//                 else {
+//                     error.value.mainImage = null
+//                     mainImageUrl.value = reader.result
+//                 }
+//             }
+//         }
+//     }
+// })
 
-    imagesUrls.value = []
-
-    for (let i = 0; i < images.value.length; i++) {
-        if (images.value[i] instanceof File) {
-            let reader = new FileReader()
-            reader.readAsDataURL(images.value[i])
-
-            reader.onload = () => {
-                let image = new Image()
-                image.src = reader.result
-
-                image.onload = function () {
-                    let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
-
-                    if (!cond) {
-                        error.value.images = 'Изображение должно быть в соотношении 4:3'
-                    }
-                    else {
-                        error.value.images = null
-                        imagesUrls.value.push(reader.result)
-                    }
-                }
-            }
-        }
-    }
-})
+// watchEffect(() => {
+//     if (images.value.length > 3) {
+//         error.value.images = '3 шт. максимально'
+//         return
+//     }
+//
+//     imagesUrls.value = []
+//
+//     for (let i = 0; i < images.value.length; i++) {
+//         if (images.value[i] instanceof File) {
+//             let reader = new FileReader()
+//             reader.readAsDataURL(images.value[i])
+//
+//             reader.onload = () => {
+//                 let image = new Image()
+//                 image.src = reader.result
+//
+//                 image.onload = function () {
+//                     let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
+//
+//                     if (!cond) {
+//                         error.value.images = 'Изображение должно быть в соотношении 4:3'
+//                     }
+//                     else {
+//                         error.value.images = null
+//                         imagesUrls.value.push(reader.result)
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// })
 
 const submit = async () => {
     if (!form.value.main_image) {
@@ -188,14 +249,12 @@ const submit = async () => {
     let data = new FormData()
 
     Object.keys(form.value).forEach(key => {
-        // console.log(key, form.value[key]);
         data.append(key, form.value[key])
     })
 
     images.value.forEach(img => {
         data.append('images[]', img)
     })
-    // data.append('images[]', images.value)
 
     let res = await axios.post(`api/admin/products`, data)
     console.log(res)

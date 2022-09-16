@@ -4,7 +4,7 @@ const formatPrice = (price) => {
 
 const pluralize = (str) => {
     if (/^1$|^[2-9]1$/.test(str.toString())) return 'товар'
-    if(/^[2-4]$|^[2-9][2-4]$/.test(str.toString())) return 'товара'
+    if (/^[2-4]$|^[2-9][2-4]$/.test(str.toString())) return 'товара'
     else return 'товаров'
 }
 
@@ -50,7 +50,11 @@ const formatTime = (time) => {
 function isIsoDate(str) {
     if (!/\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}.\d{3}Z/.test(str)) return false;
     const d = new Date(str);
-    return d instanceof Date && !isNaN(d) && d.toISOString()===str; // valid date
+    return d instanceof Date && !isNaN(d) && d.toISOString() === str; // valid date
 }
 
-export {formatPrice, pluralize, translateStatuses, formatTime, isIsoDate}
+const handleImage = async (imageFile) => {
+    //
+}
+
+export { formatPrice, pluralize, translateStatuses, formatTime, isIsoDate, handleImage }
