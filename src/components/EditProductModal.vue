@@ -35,7 +35,8 @@
                     <input class="text-sm" type="file" @change="handleMainImage">
 
                     <div class="flex">
-                        <img class="w-16 mr-3 mt-3" :src="product.main_image" alt="">
+                        <img class="w-16 mr-3 mt-3" v-if="mainImageUrl" :src="mainImageUrl" alt="">
+                        <img class="w-16 mr-3 mt-3" v-else :src="product.main_image" alt="">
                     </div>
 
                     <div class="text-sm text-mainRed">{{ error.mainImage }}</div>
@@ -91,7 +92,7 @@ import { formatPrice } from "@/functions";
 const props = defineProps(['editProductModal', 'productId'])
 const emits = defineEmits(['setModal'])
 
-const mainImage = ref(null)
+const mainImageUrl = ref(null)
 const images = ref([])
 const file = ref('')
 const error = ref({})
@@ -113,10 +114,12 @@ const handleMainImage = (event) => {
         img.onload = function() {
             let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
             if (!cond) {
+                product.value.main_image = null
                 error.value.mainImage = 'Изображение должно быть в соотношении 4:3'
             }
             else {
-                product.value.main_image = reader.result
+                mainImageUrl.value = reader.result
+                product.value.main_image = event.target.files[0]
                 error.value.mainImage = null
             }
         }
@@ -141,43 +144,44 @@ const handleImages = (event) => {
 }
 
 // images
-watchEffect(() => {
-    if (images.value.length > 3) {
-        error.value.images = '3 шт. максимально'
-        return
-    }
-
-    imagesUrls.value = []
-
-    for (let i = 0; i < images.value.length; i++) {
-        if (images.value[i] instanceof File) {
-            let reader = new FileReader()
-            reader.readAsDataURL(images.value[i])
-
-            reader.onload = () => {
-                let image = new Image()
-                image.src = reader.result
-
-                image.onload = function () {
-                    let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
-
-                    if (!cond) {
-                        error.value.images = 'Изображение должно быть в соотношении 4:3'
-                    }
-                    else {
-                        error.value.images = null
-                        // arr.push(reader.result)
-                        imagesUrls.value.push(reader.result)
-                        product.value.images = JSON.stringify([])
-                    }
-                }
-            }
-        }
-    }
-})
+// watchEffect(() => {
+//     if (images.value.length > 3) {
+//         error.value.images = '3 шт. максимально'
+//         return
+//     }
+//
+//     imagesUrls.value = []
+//
+//     for (let i = 0; i < images.value.length; i++) {
+//         if (images.value[i] instanceof File) {
+//             let reader = new FileReader()
+//             reader.readAsDataURL(images.value[i])
+//
+//             reader.onload = () => {
+//                 let image = new Image()
+//                 image.src = reader.result
+//
+//                 image.onload = function () {
+//                     let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
+//
+//                     if (!cond) {
+//                         error.value.images = 'Изображение должно быть в соотношении 4:3'
+//                     }
+//                     else {
+//                         error.value.images = null
+//                         // arr.push(reader.result)
+//                         imagesUrls.value.push(reader.result)
+//                         product.value.images = JSON.stringify([])
+//                     }
+//                 }
+//             }
+//         }
+//     }
+// })
 
 const submit = async () => {
-    if (!mainImage.value && !product.value.main_image) {
+    // console.log(product.value.main_image)
+    if (!product.value.main_image) {
         error.value.mainImage = 'Выберете 1 картинку'
         return
     }
@@ -187,7 +191,7 @@ const submit = async () => {
         return
     }
 
-    console.log(mainImage.value)
+    // console.log(product.value.main_image)
 
     let data = {
         name: product.value.name,
@@ -195,12 +199,25 @@ const submit = async () => {
         price: product.value.price,
         description: product.value.description,
         published: product.value.published,
-        main_image: mainImage.value,
-        'images[]': images.value
+        // main_image: product.value.main_image,
+        // 'images[]': images.value
     }
 
-    let res = await axios.put(`api/admin/products/${product.value.id}`, data)
-    console.log(res)
+    // let res = await axios.put(`api/admin/products/${product.value.id}`, data)
+    let imgData = new FormData()
+    imgData.append('main_image', product.value.main_image)
+    imgData.append('name', product.value.name) // product name folder
+
+    let mainImgPath = ''
+    if (product.value.main_image instanceof File) {
+        mainImgPath = await axios.post(`api/admin/image/add`, imgData)
+        product.value.main_image = mainImgPath.data
+    }
+    console.log(product.value.main_image)
+    let res = await axios.put(`/api/admin/products/${product.value.id}`, product.value)
+
+
+
 }
 </script>
 

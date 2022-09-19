@@ -49,7 +49,7 @@ import AddProductModal from '@/components/AddProductModal'
 import EditProductModal from '@/components/EditProductModal'
 
 const products = ref([])
-const editProductModal = ref(false)
+let editProductModal = ref(null)
 
 onMounted(async () => {
     // await axios.get('/sanctum/csrf-cookie');

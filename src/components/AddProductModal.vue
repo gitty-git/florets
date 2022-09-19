@@ -178,63 +178,6 @@ watchEffect(() => {
     }
 })
 
-// watchEffect(() => {
-//     if (form.value.main_image instanceof File) {
-//         let reader = new FileReader()
-//         reader.readAsDataURL(form.value.main_image)
-//
-//         reader.onload = () => {
-//             let image = new Image()
-//             image.src = reader.result
-//
-//             image.onload = function () {
-//                 let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
-//
-//                 if (!cond) {
-//                     error.value.mainImage = 'Изображение должно быть в соотношении 4:3'
-//                 }
-//                 else {
-//                     error.value.mainImage = null
-//                     mainImageUrl.value = reader.result
-//                 }
-//             }
-//         }
-//     }
-// })
-
-// watchEffect(() => {
-//     if (images.value.length > 3) {
-//         error.value.images = '3 шт. максимально'
-//         return
-//     }
-//
-//     imagesUrls.value = []
-//
-//     for (let i = 0; i < images.value.length; i++) {
-//         if (images.value[i] instanceof File) {
-//             let reader = new FileReader()
-//             reader.readAsDataURL(images.value[i])
-//
-//             reader.onload = () => {
-//                 let image = new Image()
-//                 image.src = reader.result
-//
-//                 image.onload = function () {
-//                     let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
-//
-//                     if (!cond) {
-//                         error.value.images = 'Изображение должно быть в соотношении 4:3'
-//                     }
-//                     else {
-//                         error.value.images = null
-//                         imagesUrls.value.push(reader.result)
-//                     }
-//                 }
-//             }
-//         }
-//     }
-// })
-
 const submit = async () => {
     if (!form.value.main_image) {
         error.value.mainImage = 'Выберете 1 картинку'
