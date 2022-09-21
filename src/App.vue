@@ -32,7 +32,7 @@
 
                 <div v-else class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
                     <router-link class="mr-12" :to="`/${user.role}/orders`">Заказы</router-link>
-                    <router-link class="mr-12" :to="`/${user.role}/products`">Товары</router-link>
+                    <router-link class="mr-12" :to="`/${user.role}/products`">Букеты</router-link>
                     <router-link v-if="user.role === 'admin'" to="/#bouquets">Сотрудники</router-link>
 <!--                    <div class="cursor-pointer" @click="handleLogout">Выйти</div>-->
                 </div>
@@ -184,7 +184,7 @@
                 </div>
 
                 <div v-if="user" @click.stop="isClicked = !isClicked" class="mb-12">
-                    <router-link :to="`/${user.role}/products`">Товары</router-link>
+                    <router-link :to="`/${user.role}/products`">Букеты</router-link>
                 </div>
 
                 <div v-if="user" @click.stop="isClicked = !isClicked">

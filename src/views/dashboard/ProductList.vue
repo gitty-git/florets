@@ -2,15 +2,15 @@
     <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
         <div class="mb-12 flex -ml-0.5 sm:items-center flex-col sm:flex-row">
             <div class="sm:mr-6 font-display text-2xl sm:text-4xl">
-                Список товаров
+                Список букетов
             </div>
-            <AddProductModal/>
+            <AddProductModal @productToUpdate="addToList"/>
         </div>
 
         <!-- list -->
-        <div class="my-6">
+        <div class="my-6" v-if="products.length">
             <div class="flex text-gray-400 uppercase text-xs w-full mb-3">
-                <div class="md:w-1/2 w-1/4 mr-2">Имя</div>
+                <div class="md:w-1/2 w-1/4 mr-2">Фото / Имя</div>
                 <div class="w-1/4 mr-2">Цена</div>
                 <div class="w-1/4 mr-2">Размер</div>
                 <div class="w-1/4 mr-2">Публичен</div>
@@ -36,9 +36,17 @@
                     </div>
                 </div>
 
-                <EditProductModal @setModal="v => editProductModal = v" :editProductModal="editProductModal" :productId="product.id"/>
+                <EditProductModal v-if="editProductModal === product.id"
+                                  @setModal="updateEditModalStatus"
+                                  @productToUpdate="updateList"
+                                  @productToRemove="removeFromList"
+                                  :editProductModal="editProductModal"
+                                  :productId="product.id"
+                />
             </div>
         </div>
+
+        <div v-else>Пока не букетов</div>
     </div>
 </template>
 
@@ -51,11 +59,25 @@ import EditProductModal from '@/components/EditProductModal'
 const products = ref([])
 let editProductModal = ref(null)
 
+const updateEditModalStatus = (value) => {
+    editProductModal.value = value
+}
+
+const addToList = (product) => {
+    products.value.unshift(product)
+}
+
+const updateList = (product) => {
+    products.value.forEach((p, i) => {
+        if (p.id === product.id) products.value[i] = product
+    })
+}
+
+const removeFromList = (product) => {
+    products.value = products.value.filter(p => p.id !== product.id)
+}
+
 onMounted(async () => {
-    // await axios.get('/sanctum/csrf-cookie');
-    // await axios.post('/api/products')
-    //         .then(res => console.log(res))
-    //         .catch(err => console.log(err));
     axios
             .get('/api/admin/products')
             .then(response => {

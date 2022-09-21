@@ -11,6 +11,10 @@
                     <div @click="addProductModalHidden = !addProductModalHidden" class="cursor-pointer p-6">&#9587;</div>
                 </div>
 
+                <div class="sm:mr-6 flex justify-center mb-12 font-display text-xl sm:text-2xl">
+                    ДОБАВИТЬ БУКЕТ
+                </div>
+
                 <div class="sm:px-12 px-3 pb-12">
                     <div class="my-12 max-w-screen-sm m-auto m-0">
                         <div class="mb-6">
@@ -90,13 +94,15 @@ import { ref, watchEffect } from "vue";
 import axios from "axios";
 import { handleImage } from "@/functions";
 
+const emits = defineEmits(['productToUpdate'])
 const form = ref({
-    name: 'Product Name',
-    size: 25,
-    price: 2500,
-    description: 'Product Name desc',
+    name: '',
+    size: null,
+    price: null,
+    description: '',
     published: true,
     main_image: null,
+    images: "",
 })
 const images = ref([])
 const file = ref('')
@@ -104,10 +110,6 @@ const error = ref({})
 const mainImageUrl = ref(null)
 const imagesUrls = ref([])
 const addProductModalHidden = ref(true)
-
-// const handleMainImage = async (event) => {
-//     form.value.main_image = event.target.files[0]
-// }
 
 const removeMainImage = () => {
     mainImageUrl.value = null
@@ -137,10 +139,9 @@ const handleMainImage = (event) => {
     reader.readAsDataURL(event.target.files[0])
 }
 
-const removeFromImages = (item) => {
-    imagesUrls.value.splice(item, 1)
-    images.value.splice(item, 1)
-    console.log(images.value)
+const removeFromImages = (id) => {
+    imagesUrls.value.splice(id, 1)
+    images.value.splice(id, 1)
 }
 
 const handleImages = (event) => {
@@ -151,8 +152,6 @@ const handleImages = (event) => {
 
         reader.onloadend = function() {
             const img = new Image
-
-            console.log(imagesUrls.value.length)
 
             img.onload = function() {
                 let cond = (this.height / this.width).toFixed(2) === (4 / 3).toFixed(2)
@@ -172,9 +171,10 @@ const handleImages = (event) => {
 }
 
 watchEffect(() => {
-    if (imagesUrls.value.length > 3) {
+    if (imagesUrls.value.length > 3 || images.value.length > 3) {
         error.value.images = 'Максимально 3 шт.'
         imagesUrls.value.pop()
+        images.value.pop()
     }
 })
 
@@ -189,18 +189,31 @@ const submit = async () => {
         return
     }
 
-    let data = new FormData()
+    // upload new images
+    let imgData = new FormData()
+    imgData.append('main_image', form.value.main_image) // main_image file
+    images.value.forEach((img, i) => {
+        imgData.append(`images[${i}]`, img) // image files
+    })
 
+    // image paths array in response
+    let imgRes = await axios.post(`api/admin/image/add`, imgData)
+
+    // after creating image files - save product data & image paths
+    form.value.main_image = imgRes.data.main_image
+    form.value.images = JSON.stringify(imgRes.data.images)
+
+    let res = await axios.post(`api/admin/products`, form.value)
+
+    images.value = []
     Object.keys(form.value).forEach(key => {
-        data.append(key, form.value[key])
-    })
+        form.value[key] = null;
+    });
+    imagesUrls.value = []
+    mainImageUrl.value = null
 
-    images.value.forEach(img => {
-        data.append('images[]', img)
-    })
-
-    let res = await axios.post(`api/admin/products`, data)
-    console.log(res)
+    emits('productToUpdate', res.data)
+    addProductModalHidden.value = true
 }
 </script>
 
