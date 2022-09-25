@@ -50,7 +50,7 @@
 
         <div class="mt-20">
             <router-view v-slot="{ Component }">
-                <keep-alive>
+                <keep-alive include="HomeView">
                     <component :is="Component" />
                 </keep-alive>
             </router-view>
@@ -204,6 +204,8 @@
 </template>
 
 <script setup>
+import HomeView from "@/views/HomeView"
+import { shallowRef } from 'vue'
 import { computed, onMounted, ref, watchEffect } from "vue";
 import { useStore } from 'vuex'
 import { formatPrice } from "@/functions";
@@ -216,6 +218,7 @@ let isClicked = ref(false)
 const { error, fetchUser, logout } = useAuth()
 const store = useStore()
 const router = useRouter()
+const currC = shallowRef(HomeView)
 
 const handeClick = () => {
     isClicked.value = !isClicked.value
