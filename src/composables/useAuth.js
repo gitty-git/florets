@@ -7,7 +7,7 @@ const error = ref(null)
 const login = async (email, password) => {
     error.value = null
 
-    await axios.get('/sanctum/csrf-cookie')
+    // await axios.get('/sanctum/csrf-cookie')
     return await axios.post('/login', { email, password })
         .catch(err => {
             console.log(err)
@@ -16,12 +16,13 @@ const login = async (email, password) => {
 }
 
 const logout = async () => {
-    await axios.get('/sanctum/csrf-cookie')
+    // await axios.get('/sanctum/csrf-cookie')
     await axios.post('/logout')
     await store.dispatch('setUser', null)
 }
 
 const fetchUser = async () => {
+    // await axios.get('/sanctum/csrf-cookie')
     return await axios.get('api/user')
 }
 

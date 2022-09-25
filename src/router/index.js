@@ -85,8 +85,8 @@ const router = createRouter({
         if (to.hash) {
             return {
                 el: to.hash,
-                behavior: 'smooth',
-                top: 75
+                top: 100,
+                behavior: 'smooth'
             }
         }
         if (savedPosition) {

@@ -1,5 +1,5 @@
 <template>
-    <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
+    <div class="px-6 m-0 pt-16 mb-20 m-auto max-w-screen-xl">
         <div class="mb-12 flex -ml-0.5 sm:items-center flex-col sm:flex-row">
             <div class="sm:mr-6 font-display text-2xl sm:text-4xl">
                 Список букетов
@@ -10,28 +10,29 @@
         <!-- list -->
         <div class="my-6" v-if="products.length">
             <div class="flex text-gray-400 uppercase text-xs w-full mb-3">
-                <div class="md:w-1/2 w-1/4 mr-2">Фото / Имя</div>
-                <div class="w-1/4 mr-2">Цена</div>
-                <div class="w-1/4 mr-2">Размер</div>
-                <div class="w-1/4 mr-2">Публичен</div>
+                <div class="w-1/2">Фото / Имя</div>
+                <div class="w-1/4">Цена</div>
+                <div class="w-1/4">Размер</div>
+                <div class="w-1/4">Публичен</div>
             </div>
 
             <div v-if="products" v-for="(product, id) in products"
             >
                 <div @click="editProductModal = product.id" class="w-full flex items-center border-t-2 border-gray-150 py-6">
-                    <div class="md:w-1/2 w-1/4 mr-2 md:flex items-center mr-2">
-                        <img class="lg:mb-0 w-12 mr-6 md:mb-0 mb-4" :src="product.main_image" alt="">
-                        {{ product.name }}
+                    <div class="w-1/2 flex items-start lg:items-center lg:flex-row flex-col">
+                        <div class="visible lg:invisible mb-2 absolute uppercase text-xs">{{ product.name }}</div>
+                        <img class="lg:mb-0 w-20 mr-6 lg:mt-0 mt-8" :src="product.main_image" alt="">
+                        <div class="lg:visible lg:static absolute pr-6 invisible uppercase text-sm">{{ product.name }}</div>
                     </div>
 
-                    <div class="w-1/4 mr-2">
+                    <div class="w-1/4">
                         {{ product.price }}
                     </div>
 
-                    <div class="w-1/4 mr-2">
+                    <div class="w-1/4">
                         {{ product.size }}
                     </div>
-                    <div class="w-1/4 mr-2">
+                    <div class="w-1/4">
                         {{ product.published ? 'Да' : 'Нет' }}
                     </div>
                 </div>

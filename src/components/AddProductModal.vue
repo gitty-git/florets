@@ -11,7 +11,7 @@
                     <div @click="addProductModalHidden = !addProductModalHidden" class="cursor-pointer p-6">&#9587;</div>
                 </div>
 
-                <div class="sm:mr-6 flex justify-center mb-12 font-display text-xl sm:text-2xl">
+                <div class="flex justify-center my-12 font-display text-xl sm:text-2xl">
                     ДОБАВИТЬ БУКЕТ
                 </div>
 

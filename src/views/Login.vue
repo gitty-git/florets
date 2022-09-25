@@ -28,8 +28,8 @@ import useAuth from "@/composables/useAuth";
 import { useRouter } from "vue-router";
 import { useStore } from "vuex";
 
-const email = ref('name@mail.com')
-const password = ref('12341234')
+const email = ref('')
+const password = ref('')
 const name = ref('')
 
 const { error, login, fetchUser } = useAuth()

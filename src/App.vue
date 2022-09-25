@@ -6,7 +6,7 @@
                     <img class="w-20 ml-0.5" :src="require(`@/assets/svg/logo.svg`)" alt="">
                 </router-link>
 
-                <div v-if="!user" class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
+                <div v-if="!user" class="text-xs items-center lg:visible lg:flex lg:static absolute invisible">
                     <router-link class="mr-12" to="/#bouquets">Букеты</router-link>
                     <router-link class="mr-12" to="/#about">О нас</router-link>
                     <div class="border-r-2 mr-12 h-8 border-gray-150"></div>
@@ -27,13 +27,13 @@
                                 Корзина ({{ formatPrice(itemsInCart.price) }} ₽)
                             </div>
                         </router-link>
-                    <router-link :to="{ name: 'Cart' }"></router-link>
+<!--                        <router-link :to="{ name: 'Cart' }"></router-link>-->
                 </div>
 
-                <div v-else class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
+                <div v-if="user" class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
                     <router-link class="mr-12" :to="`/${user.role}/orders`">Заказы</router-link>
                     <router-link class="mr-12" :to="`/${user.role}/products`">Букеты</router-link>
-                    <router-link v-if="user.role === 'admin'" to="/#bouquets">Сотрудники</router-link>
+                    <router-link v-if="user.role === 'admin'" to="#">Сотрудники</router-link>
 <!--                    <div class="cursor-pointer" @click="handleLogout">Выйти</div>-->
                 </div>
 
@@ -48,9 +48,14 @@
             </div>
         </nav>
 
-        <div class="mt-28">
-            <router-view/>
+        <div class="mt-20">
+            <router-view v-slot="{ Component }">
+                <keep-alive>
+                    <component :is="Component" />
+                </keep-alive>
+            </router-view>
         </div>
+
 
         <!-- Footer -->
         <!-- line w flower -->
@@ -188,7 +193,7 @@
                 </div>
 
                 <div v-if="user" @click.stop="isClicked = !isClicked">
-                    <router-link v-if="user.role === 'admin'" to="/#bouquets">Сотрудники</router-link>
+                    <router-link v-if="user.role === 'admin'" to="#">Сотрудники</router-link>
                 </div>
             </div>
         </Transition>
@@ -235,9 +240,9 @@ const setItemsInCart = () => {
     store.dispatch('setCart', { amount: cartItems.amount, price: cartItems.price })
 }
 
-const handleLogout = () => {
-    logout()
-    router.push('/')
+const handleLogout = async () => {
+    await logout()
+    await router.push('/')
 }
 
 onMounted(() => {

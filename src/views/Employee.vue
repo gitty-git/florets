@@ -1,7 +1,5 @@
 <template>
-    заказы
-    продукты
-    <button @click="handleSubmit">Выйти</button>
+    Employee page
 </template>
 
 <script setup>

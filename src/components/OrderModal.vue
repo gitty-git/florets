@@ -76,16 +76,25 @@
 
                 </div>
 
-                <div class="flex justify-end mt-6 text-xl font-medium">Итого: {{ formatPrice(total) }} ₽</div>
+                <div class="flex justify-end my-6 text-xl font-medium">Итого: {{ formatPrice(total) }} ₽</div>
 
-                <div class="my-3 text-sm font-medium">Статус заказа:</div>
-                <div class="uppercase mb-6 w-full pb-6 flex text-sm">
+                <div class="my-4 text-sm font-medium flex-wrap">Статус заказа:</div>
+                <div class="uppercase mb-6 w-full pb-6 flex text-sm flex-wrap">
                     <div :class="{'border-b text-mainRed border-mainRed' : status.eng === order.status}"
-                         class="mr-2 sm:mr-4 cursor-pointer text-gray-400"
+                         class="mr-2 mb-2 sm:mr-4 cursor-pointer text-gray-400"
                          v-for="status in translatedStatuses" @click="changeStatus(status)">
                         {{ status.ru }}
                     </div>
                 </div>
+
+<!--                <div class="flex pt-12 flex-wrap" v-if="orders && computedOrders.length > 0">-->
+<!--                    <div class="mr-6 text-gray-400 mb-4 text-sm uppercase cursor-pointer"-->
+<!--                         :class="{'text-mainRed underline' : activeCategory === status.eng }"-->
+<!--                         @click="fetchByStatus(status, id)"-->
+<!--                         v-for="(status, id) in categoryStatus">-->
+<!--                        {{ status.ru }}-->
+<!--                    </div>-->
+<!--                </div>-->
 
                 <div class="w-full flex justify-center text-mainRed text-sm">{{ error.message }}</div>
 

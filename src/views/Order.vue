@@ -1,5 +1,5 @@
 <template>
-    <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
+    <div class="px-6 m-0 pt-16 mb-20 m-auto max-w-screen-xl">
         <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
         <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} {{ pluralizedGoods }} на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
 
@@ -185,21 +185,27 @@ const handlePayment = (payment) => {
 }
 
 const setDates = () => {
-    let currDate = new Date
-    let first = currDate.getDate() - currDate.getDay() + 1
     let opens = new Date(workingHours.value.opens_at)
     let closes = new Date(workingHours.value.closes_at)
+    let currDate = new Date
+    let firstDateNum = currDate.getDate() - currDate.getDay() + -6
+    let firstDay = new Date()
+    firstDay.setDate(firstDateNum)
 
-    for (let i = 0; i < 14; i++) {
-        dates.value.push(new Date(currDate.setDate(first + i)))
+    for (let i = 0; i < 21; i++) {
+        let openDate = new Date(firstDay.getTime() + 86400000 * i)
+        openDate.setHours(opens.getHours())
+        openDate.setMinutes(opens.getMinutes())
+
+        let closeDate = new Date(firstDay.getTime() + 86400000 * i)
+        closeDate.setHours(closes.getHours())
+        closeDate.setMinutes(closes.getMinutes())
+
+        let available = closeDate.getTime() > new Date().setHours(currDate.getHours() + 3)
+        // console.log(closeDate , '--',  new Date(new Date().setHours(currDate.getHours() + 3)), 'ava:',  available)
+
+        dates.value.push({ date: new Date(firstDay.getTime() + 86400000 * i), available })
     }
-
-    let arr = []
-    dates.value.forEach(date => {
-        let sameDates = date.getDate() === closes.getDate()
-        arr.push({date, available: (date > closes)})
-    })
-    dates.value = arr
 }
 
 const setAvailableHours = () => {
@@ -364,7 +370,7 @@ onMounted(async () => {
         yMap.value = new ymaps.SuggestView('inputAddress')
     })
 
-    let res = await axios.get(`api/opening-hours/`)
+    let res = await axios.get(`api/opening-hours`)
     workingHours.value = res.data
 
     setDates()

@@ -6,8 +6,8 @@ import { store } from './store/index'
 import './assets/tailwind.css'
 import axios from "axios";
 
+process.env.NODE_ENV === 'development' ? axios.defaults.baseURL = 'http://127.0.0.1:8000/' : axios.defaults.baseURL = 'https://laravel.florets.store/'
 axios.defaults.withCredentials = true;
-process.env.NODE_ENV === 'development' ? axios.defaults.baseURL = 'http://127.0.0.1:8000/' : axios.defaults.baseURL = ''
 
 createApp(App)
     .use(router)

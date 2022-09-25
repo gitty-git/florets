@@ -1,5 +1,5 @@
 <template>
-    <div v-if="product" class="px-6 m-0 lg:pt-16 pt-12 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
+    <div v-if="product" class="px-6 m-0 pt-16 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
         <div class="lg:w-1/2 w-full mb-12 sm:flex-row flex-col flex justify-between">
             <img class="mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="mainImage" alt="">
 
@@ -85,7 +85,6 @@
 <script setup>
 import { onMounted, computed, ref, onBeforeMount } from "vue";
 import { useRoute } from "vue-router";
-import { products } from "@/products";
 import { useStore } from 'vuex'
 import { formatPrice } from "@/functions";
 import axios from "axios";

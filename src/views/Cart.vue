@@ -1,5 +1,5 @@
 <template>
-    <div class="px-6 m-0 lg:pt-16 pt-6 mb-20 m-auto max-w-screen-xl">
+    <div class="px-6 m-0 pt-16 mb-20 m-auto max-w-screen-xl">
         <div class="font-display -ml-0.5 text-2xl lg:text-4xl">Корзина</div>
         <div v-if="!products.length" class="font-sm text-gray-400 mt-4 mb-12">Корзина пуста.</div>
 
