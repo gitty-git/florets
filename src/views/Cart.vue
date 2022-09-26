@@ -1,5 +1,7 @@
 <template>
-    <div class="px-6 m-0 pt-16 mb-20 m-auto max-w-screen-xl">
+    <transition appear enter-active-class="transition transform duration-500 ease-out"
+                enter-from-class="-translate-y-full opacity-0">
+    <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
         <div class="font-display -ml-0.5 text-2xl lg:text-4xl">Корзина</div>
         <div v-if="!products.length" class="font-sm text-gray-400 mt-4 mb-12">Корзина пуста.</div>
 
@@ -81,6 +83,7 @@
             </router-link>
         </div>
     </div>
+    </transition>
 </template>
 
 <script setup>

@@ -1,28 +1,40 @@
 <template>
-    <div v-if="product" class="px-6 m-0 pt-16 pb-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
+    <transition appear enter-active-class="transition transform duration-500 ease-out"
+                enter-from-class="-translate-y-full opacity-0">
+    <div v-if="product" class="px-6 m-0 py-20 m-auto flex lg:flex-row flex-col max-w-screen-xl">
         <div class="lg:w-1/2 w-full mb-12 sm:flex-row flex-col flex justify-between">
-            <img class="mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="mainImage" alt="">
+            <img class="mb-6 z-10 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3" :src="mainImage" alt="">
 
             <div class="sm:w-1/6 sm:flex sm:flex-col grid grid-cols-4 gap-x-6 items-stretch justify-between">
 <!--                <img class="sm:mr-0 hover:scale-105 cursor-pointer duration-150" :src="product.main_image" alt="">-->
-                <img v-for="(image, key) in images" :key="key"
-                     class="sm:mr-0 hover:scale-105 cursor-pointer duration-150"
-                     :src="image" alt=""
-                     @click="mainImage = image"
-                >
+                <div v-for="(image, key) in images" :key="key">
+                    <transition
+                            enter-active-class="transition transform duration-300 ease-out"
+                            enter-from-class="-translate-x-full opacity-0"
+                            leave-active-class="transition transform duration-300 ease-in"
+                            leave-to-class="translate-x-full opacity-0"
+                    >
+                    <img v-on:load="onLoaded" v-show="loaded"
+                         class="sm:mr-0 hover:scale-105 cursor-pointer duration-150"
+                         :src="image" alt=""
+                         @click="mainImage = image"
+                    >
+                    </transition>
+                </div>
+
             </div>
         </div>
 
         <div class="lg:pl-20 w-full lg:w-1/2">
             <div>
-                <div class="flex">
-                    <div class="font-display text-2xl lg:text-4xl">
+                <div class="flex flex-wrap mb-2">
+                    <div class="font-display text-3xl lg:text-4xl mr-3 mb-1">
                         {{ product.name }}
                     </div>
-                    <div class="text-sm mt-1.5 ml-4">⌀ {{ product.size }} см</div>
+                    <div class="text-sm mt-1">⌀ {{ product.size }} см</div>
                 </div>
 
-                <div class="text-gray-400 mt-2 text-xl">
+                <div class="text-gray-400 text-2xl">
                     {{ formattedPrice }} ₽
                 </div>
             </div>
@@ -53,7 +65,7 @@
                     </div>
                 </div>
 
-                <div class="xl:mt-0 mt-6 duration-150 w-2/3 xl:w-96 font-bold text-xs uppercase">
+                <div class="xl:mt-0 mt-6 duration-150 w-2/3 xl:w-96 font-medium text-xs uppercase">
                     <router-link class="text-mainRed flex border-2 h-16 flex justify-center border-opacity-20 items-center border-mainRed "
                                  v-if="alreadyInCart"
                                  :to="{name: 'Cart'}"
@@ -67,7 +79,7 @@
                         </div>
                     </router-link>
                     <div v-else
-                         class="hover:bg-white text-white bg-mainRed cursor-pointer hover:text-mainRed border-mainRed border-2 flex justify-center items-center h-16"
+                         class="hover:bg-white px-3 font-medium text-xs text-white bg-mainRed cursor-pointer hover:text-mainRed border-mainRed border-2 flex justify-center items-center h-16"
                          @click="addProduct"
                     >
                         Добавить в корзину
@@ -80,6 +92,7 @@
             </div>
         </div>
     </div>
+    </transition>
 </template>
 
 <script setup>
@@ -97,9 +110,14 @@ const route = useRoute()
 const product = ref(null)
 const cart = ref([])
 const mainImage = ref()
+const loaded = ref(false)
 
 const increase = () => {
     if (amount.value < 99) amount.value++
+}
+
+const onLoaded = () => {
+    loaded.value = true
 }
 
 const decrease = () => {

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div @click="addProductModalHidden = false"
-             class="w-fit text-sm mt-6 cursor-pointer sm:mt-2 px-3 py-2 rounded border-gray-150 border-2">
+             class="w-fit sm:-mt-4 absolute text-sm cursor-pointer px-3 py-2 rounded border-gray-150 border-2">
             Добавить
         </div>
 
@@ -109,7 +109,7 @@ const file = ref('')
 const error = ref({})
 const mainImageUrl = ref(null)
 const imagesUrls = ref([])
-const addProductModalHidden = ref(true)
+let addProductModalHidden = ref(true)
 
 const removeMainImage = () => {
     mainImageUrl.value = null

@@ -1,5 +1,7 @@
 <template>
-    <div class="px-6 m-0 pt-16 mb-20 m-auto max-w-screen-xl">
+    <transition appear enter-active-class="-transition transform duration-500 ease-out"
+                enter-from-class="translate-y-full opacity-0">
+    <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
         <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
         <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} {{ pluralizedGoods }} на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
 
@@ -41,7 +43,9 @@
             </div>
 
             <!-- date -->
-            <div class="flex flex-col justify-center items-center mt-12">
+            <transition appear enter-active-class="-transition transform duration-500 ease-out"
+                        enter-from-class="translate-y-full opacity-0">
+                <div v-if="dates.length" class="flex flex-col justify-center items-center mt-12">
                 <div class="w-full pr-12 text-sm">Выберете желаемую дату доставки:</div>
 
                 <div class="grid grid-cols-7 gap-6 w-full mt-6">
@@ -68,8 +72,12 @@
                     </div>
                 </div>
             </div>
+            </transition>
+
 
             <!-- time -->
+            <transition appear enter-active-class="-transition transform duration-500 ease-out"
+                        enter-from-class="translate-y-full opacity-0">
             <div v-if="!availableHoursHidden" class="flex flex-col justify-center items-center mt-12">
                 <div class="w-full pr-12 text-sm">Выберете желаемое время доставки:</div>
                 <div class="mt-6 grid font-medium grid-cols-2 sm:grid-cols-4 gap-3">
@@ -82,7 +90,10 @@
                     </div>
                 </div>
             </div>
+            </transition>
 
+            <transition appear enter-active-class="-transition transform duration-500 ease-out"
+                        enter-from-class="translate-y-full opacity-0">
             <!-- payment -->
             <div v-if="!paymentHidden" class="flex flex-col justify-center items-center mt-12">
                 <div class="w-full pr-12 text-sm">Выберете способ оплаты:</div>
@@ -95,22 +106,27 @@
                          class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 uppercase">Картой</div>
                 </div>
             </div>
+            </transition>
 
             <div class="w-full left-0 absolute mt-6 text-sm flex justify-center text-mainRed">{{ expiredTimeErr }}</div>
 
+            <transition appear enter-active-class="-transition transform duration-500 ease-out"
+                        enter-from-class="translate-y-full opacity-0">
             <!-- submit -->
             <div v-if="!submitHidden" class="w-full flex mt-16 justify-center" >
                 <div @click="handleSubmit" class="btn">
                     Подтвердить
                 </div>
             </div>
+            </transition>
         </div>
     </div>
+    </transition>
 </template>
 
 <script setup>
 import Input from "@/components/Input";
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { computed, onBeforeMount, onMounted, ref, watchEffect } from "vue";
 import { useStore } from 'vuex'
 import { formatPrice, formatTime, pluralize } from '@/functions'
 import axios from "axios";
@@ -365,7 +381,7 @@ watchEffect(() => {
     }
 })
 
-onMounted(async () => {
+onBeforeMount(async () => {
     ymaps.ready(() => {
         yMap.value = new ymaps.SuggestView('inputAddress')
     })

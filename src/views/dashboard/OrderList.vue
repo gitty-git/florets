@@ -1,5 +1,5 @@
 <template>
-    <div class="px-6 m-0 pt-16 mb-20 m-auto max-w-screen-xl">
+    <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
         <div class="font-display -ml-0.5 text-2xl lg:text-4xl">Список заказов</div>
 
         <div class="flex pt-12 flex-wrap" v-if="orders && computedOrders.length > 0">

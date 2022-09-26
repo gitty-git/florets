@@ -1,13 +1,14 @@
 <template>
+    <div>
     <!-- Баннер -->
-    <div class="w-full relative flex items-center">
+    <div class="z-10 w-full relative flex items-center">
         <img class="object-cover w-full h-128 sm:h-160" :src="require(`@/assets/images/banner3.jpg`)" alt="">
         <div class="w-full absolute">
             <div class="max-w-screen-xl m-0 m-auto">
                 <div class="px-6 w-full pt-8 flex flex-col items-center">
-                    <div class="font-display text-center text-white uppercase font-black lg:-ml-1.5 leading-snug text-3xl sm:text-6xl">
+                    <h1 class="font-display text-center text-white uppercase font-black lg:-ml-1.5 leading-snug text-3xl sm:text-6xl">
                         Доставка цветов в Челябинске
-                    </div>
+                    </h1>
 
                     <div class="mt-6 mb-4">
                         <svg width="80" height="54" viewBox="0 0 43 27" class="fill-white" xmlns="http://www.w3.org/2000/svg">
@@ -42,7 +43,9 @@
     </div>
 
     <!-- Букеты -->
-    <div id="bouquets" class="py-16 flex justify-center">
+        <transition appear enter-active-class="transition transform duration-500 ease-out"
+                    enter-from-class="-translate-y-full opacity-0">
+        <div v-if="products.length" id="bouquets" class="py-16 flex justify-center">
         <div class="max-w-screen-xl px-6">
             <div class="mb-10">
                 <div class="font-medium mb-1 text-2xl uppercase">
@@ -69,6 +72,7 @@
             </div>
         </div>
     </div>
+    </transition>
 
     <!-- О нас -->
     <div id="about" class="bg-gradient-to-b flex justify-center from-gray-100 shadow-inner shadow-gray-200 pt-16 mb-20">
@@ -92,23 +96,24 @@
 
                     <ul class="leading-loose mt-9">
                         <li class="mt-3">
-                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-75 absolute"></span>
+                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-60 absolute"></span>
                             <span class="sm:ml-0 ml-4">Мы гарантируем, что все наши цветы будут свежими не менее трех дней.</span>
                         </li>
 
                         <li class="mt-3">
-                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-75 absolute"></span>
+                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-60 absolute"></span>
                             <span class="sm:ml-0 ml-4">Каждый букет создается опытным флористом.</span>
                         </li>
 
                         <li class="mt-3">
-                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-75 absolute"></span>
+                            <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-60 absolute"></span>
                             <span class="sm:ml-0 ml-4">Бесплатная доставка в любую точку города Челябинска.</span>
                         </li>
                     </ul>
                 </div>
             </div>
         </div>
+    </div>
     </div>
 </template>
 
