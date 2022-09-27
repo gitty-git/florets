@@ -93,15 +93,27 @@
         </router-link>
 
         <div v-else>
-            Вы вошли как&nbsp;{{ user.name }}. <span class="cursor-pointer underline" @click="$emit('logout')">Выйти</span>
+            Вы вошли как&nbsp;{{ user.name }}. <span class="cursor-pointer underline" @click="handleLogout">Выйти</span>
         </div>
-
     </div>
 </template>
 
 <script setup>
-defineProps(['user'])
-defineEmits(['logout'])
+import useAuth from "@/composables/useAuth";
+import { useStore } from "vuex";
+import { useRouter } from "vue-router";
+import { computed } from "vue"
+
+const { error, logout } = useAuth()
+const store = useStore()
+const router = useRouter()
+
+const user = computed(() => store.state.user.userData)
+
+const handleLogout = async () => {
+    await logout()
+    await router.push('/')
+}
 </script>
 
 <style scoped>

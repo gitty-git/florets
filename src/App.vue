@@ -2,11 +2,13 @@
     <div id="home">
         <nav class="uppercase fixed top-0 bg-white z-30 w-full shadow-line">
             <div class="max-w-screen-xl m-0 m-auto px-6 items-center h-28 flex justify-between">
-                <router-link to="/#home">
+                <router-link to="/">
                     <img class="w-24 ml-0.5 -mt-1.5" :src="require(`@/assets/svg/logo.svg`)" alt="">
                 </router-link>
 
                 <div v-if="!user" class="text-xs items-center lg:visible lg:flex lg:static absolute invisible">
+<!--                    <div class="mr-12 cursor-pointer" @click="goTo('bouquets')">Букеты</div>-->
+<!--                    <div class="mr-12 cursor-pointer" @click="goTo('about')">О нас</div>-->
                     <router-link class="mr-12" to="/#bouquets">Букеты</router-link>
                     <router-link class="mr-12" to="/#about">О нас</router-link>
                     <div class="border-r-2 mr-12 h-8 border-gray-150"></div>
@@ -27,49 +29,62 @@
                                 Корзина ({{ formatPrice(itemsInCart.price) }} ₽)
                             </div>
                         </router-link>
-<!--                        <router-link :to="{ name: 'Cart' }"></router-link>-->
                 </div>
 
                 <div v-if="user" class="text-xs mt-4 items-center lg:visible lg:flex lg:static absolute invisible">
                     <router-link class="mr-12" :to="`/${user.role}/orders`">Заказы</router-link>
                     <router-link class="mr-12" :to="`/${user.role}/products`">Букеты</router-link>
-                    <router-link v-if="user.role === 'admin'" to="#">Сотрудники</router-link>
+                    <router-link class="mr-12 cursor-default text-gray-400" v-if="user.role === 'admin'" to="#">Сотрудники</router-link>
                     <div class="cursor-pointer" @click="handleLogout">Выйти</div>
                 </div>
 
-                <div v-show="!isClicked" @click="handeClick"
-                     class="lg:absolute p-4 -mr-4 flex visible lg:invisible static lg:absolute">
-                    <svg width="24" height="24" viewBox="0 0 19 13" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <line x1="-2.91409e-08" y1="0.75" x2="19" y2="0.749999" stroke="black" stroke-width="0.5"/>
-                        <line x1="-2.91409e-08" y1="6.75" x2="19" y2="6.75" stroke="black" stroke-width="0.5"/>
-                        <line x1="-2.18557e-08" y1="12.75" x2="19" y2="12.75" stroke="black" stroke-width="0.5"/>
-                    </svg>
+                <div class="lg:absolute -mr-2 flex visible lg:invisible static lg:absolute">
+                    <router-link :to="{ name: 'Cart' }" class="mr-3">
+                        <div class="-mt-0.5 p-2">
+                            <div v-if="itemsInCart.amount > 0"
+                                 class="ml-3 w-5 h-5 flex items-center justify-center -mt-1 text-white font-medium px-1 bg-mainRed rounded-full absolute"
+                                 :class="{'w-auto': itemsInCart.amount > 99}"
+                            >
+                                {{ itemsInCart.amount }}
+                            </div>
+                            <svg width="26" height="26" viewBox="0 0 26 26" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M17.3337 9.75001V6.50001C17.3337 4.10677 15.3936 2.16667 13.0004 2.16667C10.6072 2.16667 8.66706 4.10677 8.66706 6.50001V9.75M3.89173 11.2146L3.24173 18.148C3.05691 20.1193 2.96451 21.105 3.29161 21.8663C3.57896 22.5351 4.08252 23.0881 4.72158 23.4366C5.44904 23.8333 6.43904 23.8333 8.41902 23.8333H17.5818C19.5617 23.8333 20.5517 23.8333 21.2792 23.4366C21.9183 23.0881 22.4218 22.5351 22.7092 21.8663C23.0363 21.105 22.9439 20.1193 22.7591 18.148L22.1091 11.2146C21.953 9.54996 21.875 8.71763 21.5006 8.08835C21.1709 7.53414 20.6838 7.09054 20.1012 6.814C19.4397 6.50001 18.6037 6.50001 16.9318 6.50001L9.06903 6.50001C7.39705 6.50001 6.56107 6.50001 5.89959 6.814C5.31703 7.09054 4.8299 7.53414 4.50019 8.08835C4.12582 8.71763 4.04779 9.54996 3.89173 11.2146Z"
+                                      stroke="black" stroke-linecap="round" stroke-linejoin="round"/>
+                            </svg>
+                        </div>
+                    </router-link>
+
+                    <div v-show="!isClicked" @click="handeClick" class="p-2">
+                        <svg width="24" height="24" viewBox="0 0 19 13" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <line x1="-2.91409e-08" y1="0.75" x2="19" y2="0.749999" stroke="black" stroke-width="0.5"/>
+                            <line x1="-2.91409e-08" y1="6.75" x2="19" y2="6.75" stroke="black" stroke-width="0.5"/>
+                            <line x1="-2.18557e-08" y1="12.75" x2="19" y2="12.75" stroke="black" stroke-width="0.5"/>
+                        </svg>
+                    </div>
                 </div>
+
             </div>
         </nav>
 
-        <div class="mt-20">
-            <router-view v-slot="{ Component }">
-                <keep-alive include="HomeView">
-                    <component :is="Component" />
-                </keep-alive>
+        <div class="overflow-hidden mt-20">
+            <router-view v-slot="{ Component, route }">
+<!--                <keep-alive include="Home">-->
+                <transition name="route" >
+                    <component :is="Component" :key="route.path"/>
+                </transition>
+<!--                </keep-alive>-->
             </router-view>
         </div>
 
-        <!-- Footer -->
-        <Footer class="bottom-0" @logout="handleLogout" :user="user"/>
-
         <!-- mobile menu -->
-        <transition
-                enter-active-class="duration-200 ease-out"
-                enter-from-class="transform opacity-0"
-                enter-to-class="opacity-100"
-                leave-active-class="duration-200 ease-in"
-                leave-from-class="opacity-100"
-                leave-to-class="transform opacity-0"
+        <transition appear
+                    enter-active-class="duration-500 ease-out"
+                    enter-from-class="-translate-y-full"
+                    leave-active-class="duration-200 ease-out"
+                    leave-to-class="-translate-y-full"
         >
             <div v-if="isClicked"
-                 class="blurred shadow-md fixed w-full py-24 top-0 right-0 text-2xl flex flex-col items-center">
+                 class="blurred shadow-md z-50 fixed w-full py-24 top-0 right-0 text-2xl flex flex-col items-center">
                 <div class="mb-12 p-4 font-black" @click="isClicked = !isClicked">&#9587;</div>
 
                 <!-- if no user -->
@@ -97,6 +112,8 @@
                 <div v-if="user" @click.stop="isClicked = !isClicked">
                     <router-link v-if="user.role === 'admin'" to="#">Сотрудники</router-link>
                 </div>
+
+                <div class="cursor-pointer" @click="handleLogout">Выйти</div>
             </div>
         </Transition>
 
@@ -106,14 +123,13 @@
 </template>
 
 <script setup>
-import HomeView from "@/views/HomeView"
+import HomeView from "@/views/Home"
 import { shallowRef } from 'vue'
 import { computed, onMounted, ref, watchEffect } from "vue";
 import { useStore } from 'vuex'
 import { formatPrice } from "@/functions";
 import useAuth from "@/composables/useAuth";
 import { useRouter } from "vue-router";
-import Footer from "@/components/Footer"
 
 // let isClicked = false
 let isClicked = ref(false)
@@ -121,10 +137,32 @@ let isClicked = ref(false)
 const { error, fetchUser, logout } = useAuth()
 const store = useStore()
 const router = useRouter()
-const currC = shallowRef(HomeView)
+const productsLoaded = ref(null)
 
 const handeClick = () => {
     isClicked.value = !isClicked.value
+}
+
+// const doSomething = (v) => {
+//     window.scrollTo(0, v.bouquetsTop + 200)
+//     productsLoaded.value = v
+//     console.log(productsLoaded.value)
+// }
+
+const goTo = (v) => {
+    // productsLoaded.value
+    // let route = `/#${v}`
+    // console.log(route)
+    // router.push(`/#${v}`)
+
+    // setTimeout(() => {
+    //     let el = document.getElementById(v)
+    //     el.scrollIntoView()
+    //     console.log(el)
+    // }, 1000)
+
+    // el.scrollIntoView()
+    // router.push(v)
 }
 
 const itemsInCart = computed(() => store.state.cart.items)
@@ -147,6 +185,11 @@ const handleLogout = async () => {
     await router.push('/')
 }
 
+// const handleLogout = async () => {
+//     await logout()
+//     await router.push('/')
+// }
+
 onMounted(() => {
     fetchUser()
             .then(res => store.dispatch('setUser', res.data))
@@ -160,7 +203,20 @@ onMounted(() => {
 
 <style>
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500&family=Noto+Serif+Display:wght@400;700&display=swap');
-
+.route-enter-from {
+    opacity: 0;
+    transform: translateX(100%);
+}
+.route-enter-active {
+    transition: all 0.5s ease-out;
+}
+.route-leave-to {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+.route-leave-active {
+    transition: all 0.5s ease-out;
+}
 .blurred {
     background: rgb(255, 255, 255, 0.6);
     backdrop-filter: blur(12px);

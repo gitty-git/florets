@@ -1,4 +1,5 @@
 <template>
+    <div>
     <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
         <div class="mb-12 flex -ml-0.5 sm:items-center flex-col sm:flex-row">
             <div class="sm:mr-6 font-display text-2xl sm:text-4xl">
@@ -49,9 +50,12 @@
 
         <div v-else>Пока не букетов</div>
     </div>
+    <Footer/>
+    </div>
 </template>
 
 <script setup>
+import Footer from '@/components/Footer'
 import { onMounted, ref } from "vue";
 import axios from "axios";
 import AddProductModal from '@/components/AddProductModal'

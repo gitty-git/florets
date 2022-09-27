@@ -1,63 +1,71 @@
 <template>
-    <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
-        <div class="font-display -ml-0.5 text-2xl lg:text-4xl">Список заказов</div>
+    <div>
+        <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
+            <div class="font-display -ml-0.5 text-2xl lg:text-4xl">Список заказов</div>
 
-        <div class="flex pt-12 flex-wrap" v-if="orders && computedOrders.length > 0">
-            <div class="mr-6 text-gray-400 mb-4 text-sm uppercase cursor-pointer"
-                 :class="{'text-mainRed underline' : activeCategory === status.eng }"
-                 @click="fetchByStatus(status, id)"
-                 v-for="(status, id) in categoryStatus">
-                {{ status.ru }}
-            </div>
-        </div>
-
-        <!-- list -->
-        <div class="my-6" v-if="orders && computedOrders.length > 0">
-            <div class="flex text-gray-400 uppercase text-xs w-full mb-3">
-                <div class="w-1/2 mr-4">Имя</div>
-                <div class="w-1/4 mx-2">Создан</div>
-                <div class="w-1/4 mx-2">Статус</div>
-            </div>
-
-            <div v-if="orders" class="cursor-pointer sm:text-base text-sm border-gray-150 border-t-2 flex py-6"
-                 v-for="order in computedOrders" @click="showOrderModal(order.id)"
-            >
-                <div class="w-1/2 mr-2">
-                    {{ order.name }}
-                </div>
-                <div class="w-1/4 mr-2">
-                    {{ order.created_at }}
-                </div>
-                <div class="w-1/4">
-                    {{ translateStatuses(order.status).ru }}
+            <div class="flex pt-12 flex-wrap" v-if="orders && computedOrders.length > 0">
+                <div class="mr-6 text-gray-400 mb-4 text-sm uppercase cursor-pointer"
+                     :class="{'text-mainRed underline' : activeCategory === status.eng }"
+                     @click="fetchByStatus(status, id)"
+                     v-for="(status, id) in categoryStatus">
+                    {{ status.ru }}
                 </div>
             </div>
+
+            <!-- list -->
+            <div class="my-6" v-if="orders && computedOrders.length > 0">
+                <div class="flex text-gray-400 uppercase text-xs w-full mb-3">
+                    <div class="w-1/2 mr-4">Имя</div>
+                    <div class="w-1/4 mx-2">Создан</div>
+                    <div class="w-1/4 mx-2">Статус</div>
+                </div>
+
+                <div v-if="orders" class="cursor-pointer sm:text-base text-sm border-gray-150 border-t-2 flex py-6"
+                     v-for="order in computedOrders" @click="showOrderModal(order.id)"
+                >
+                    <div class="w-1/2 mr-2">
+                        {{ order.name }}
+                    </div>
+                    <div class="w-1/4 mr-2">
+                        {{ order.created_at }}
+                    </div>
+                    <div class="w-1/4">
+                        {{ translateStatuses(order.status).ru }}
+                    </div>
+                </div>
+            </div>
+
+            <!-- pagination -->
+            <div v-if="orders && computedOrders.length > 0" class="flex justify-center items-center">
+                <div @click="prevPage"
+                     class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
+                    <img class="w-2" :src="require(`@/assets/svg/arrow.svg`)" alt="">
+                </div>
+
+                <div class="mx-6">
+                    {{ orders.current_page }}
+                </div>
+
+                <div @click="nextPage"
+                     class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
+                    <img class="w-2 rotate-180" :src="require(`@/assets/svg/arrow.svg`)" alt="">
+                </div>
+            </div>
+
+            <div v-else class="mt-6">Нет заказов...</div>
+
+            <OrderModal @modalHidden="showOrderModal" @order="updateOrders" :modalHidden="modalHidden"
+                        v-if="!modalHidden" :orderId="orderId"/>
+
+            <!-- Footer -->
+
         </div>
-
-        <!-- pagination -->
-        <div v-if="orders && computedOrders.length > 0" class="flex justify-center items-center">
-            <div @click="prevPage"
-                 class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
-                <img class="w-2" :src="require(`@/assets/svg/arrow.svg`)" alt="">
-            </div>
-
-            <div class="mx-6">
-                {{ orders.current_page }}
-            </div>
-
-            <div @click="nextPage"
-                 class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
-                <img class="w-2 rotate-180" :src="require(`@/assets/svg/arrow.svg`)" alt="">
-            </div>
-        </div>
-
-        <div v-else class="mt-6">Нет заказов...</div>
-
-        <OrderModal @modalHidden="showOrderModal" @order="updateOrders" :modalHidden="modalHidden" v-if="!modalHidden" :orderId="orderId"/>
+        <Footer/>
     </div>
 </template>
 
 <script setup>
+import Footer from '@/components/Footer'
 import { computed, onMounted, ref } from "vue";
 import axios from "axios";
 import { useStore } from "vuex";

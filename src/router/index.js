@@ -1,17 +1,14 @@
 import { createRouter, createWebHistory } from 'vue-router'
-import HomeView from '../views/HomeView.vue'
+import Home from '../views/Home.vue'
 
 const routes = [
     {
-        name: 'Bouquets',
-        el: document.getElementById('bouquets'),
-        top: 1000,
-        component: HomeView
-    },
-    {
         path: '/',
-        name: 'home',
-        component: HomeView
+        name: 'Home',
+        component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue'),
+        meta: {
+            scrollTop: 0
+        },
     },
     {
         path: '/products/:id',
@@ -79,23 +76,42 @@ const routes = [
     },
 ]
 
+const scrollBehavior = (to, from, savedPosition) => {
+    console.log(to.hash)
+    const toHash = to.hash && {el: to.hash, top: 100}
+
+    if (to.name === from.name && !to.hash) {
+        to.meta?.scrollPos && (to.meta.scrollPos.top = 0)
+        return { top: 0 }
+    }
+    const pos = savedPosition || to.meta?.scrollPos || { top: 0 }
+
+    return new Promise((resolve) => {
+        setTimeout(() => {
+            if (to.hash) {
+                resolve({el: to.hash, top: 100})
+            }
+            resolve(pos)
+        }, 500)
+        // setTimeout(() => {
+        //
+        // }, 1000)
+    })
+}
+
+
 const router = createRouter({
     history: createWebHistory(process.env.BASE_URL),
-    scrollBehavior(to, from, savedPosition) {
-        if (to.hash) {
-            return {
-                el: to.hash,
-                top: 100,
-                behavior: 'smooth'
-            }
-        }
-        if (savedPosition) {
-            return savedPosition
-        } else {
-            return { top: 0 }
-        }
-    },
+    scrollBehavior,
     routes
+})
+
+router.beforeEach((to, from, next) => {
+    console.log('window.scrollY:', window.scrollY)
+    from.meta?.scrollTop && (from.meta.scrollTop = window.scrollY)
+    console.log('from:\t', from.name, '\t', from.meta)
+    console.log('to:\t\t', to.name, '\t', to.meta)
+    return next()
 })
 
 export default router

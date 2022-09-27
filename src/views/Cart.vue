@@ -1,9 +1,8 @@
 <template>
-    <transition appear enter-active-class="transition transform duration-500 ease-out"
-                enter-from-class="-translate-y-full opacity-0">
+    <div class="absolute w-full">
     <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
         <div class="font-display -ml-0.5 text-2xl lg:text-4xl">Корзина</div>
-        <div v-if="!products.length" class="font-sm text-gray-400 mt-4 mb-12">Корзина пуста.</div>
+        <div class="font-sm text-gray-400 mt-4 mb-12">Корзина пуста.</div>
 
         <!-- list -->
         <div class="mt-12" v-if="products.length">
@@ -83,10 +82,12 @@
             </router-link>
         </div>
     </div>
-    </transition>
+    <Footer/>
+    </div>
 </template>
 
 <script setup>
+import Footer from '@/components/Footer'
 import { computed, onMounted, ref, watchEffect } from "vue";
 import { formatPrice, pluralize } from "@/functions";
 import { store } from "@/store";

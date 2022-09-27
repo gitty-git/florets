@@ -1,4 +1,5 @@
 <template>
+    <div class="absolute w-full overflow-hidden overscroll-x-none">
     <transition appear enter-active-class="-transition transform duration-500 ease-out"
                 enter-from-class="translate-y-full opacity-0">
     <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
@@ -122,6 +123,9 @@
         </div>
     </div>
     </transition>
+
+
+    </div>
 </template>
 
 <script setup>
