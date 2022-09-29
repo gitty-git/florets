@@ -78,10 +78,10 @@
 
                 <div class="flex justify-end my-6 text-xl font-medium">Итого: {{ formatPrice(total) }} ₽</div>
 
-                <div class="my-4 text-sm font-medium flex-wrap">Статус заказа:</div>
+                <div class="my-3 text-sm font-medium flex-wrap">Статус заказа:</div>
                 <div class="uppercase mb-6 w-full pb-6 flex text-sm flex-wrap">
                     <div :class="{'border-b text-mainRed border-mainRed' : status.eng === order.status}"
-                         class="mr-2 mb-2 sm:mr-4 cursor-pointer text-gray-400"
+                         class="mr-6 mb-3 cursor-pointer text-gray-400"
                          v-for="status in translatedStatuses" @click="changeStatus(status)">
                         {{ status.ru }}
                     </div>
@@ -181,10 +181,13 @@ const save = async () => {
     if (!order.value.name || !order.value.phone || !order.value.address) {
         error.value.message = `Поля "Имя", "Телефон" и "Адрес" обязательны для заполнения`
     }
+    await axios.put(`api/orders/${order.value.id}`, order.value)
+            .then(res => {
+                emits('modalHidden', false)
+                emits('order', order.value)
+            })
+            .catch(err => console.log(err))
 
-    let res = await axios.put(`api/orders/${order.value.id}`, order.value)
-    emits('modalHidden', false)
-    emits('order', order.value)
 }
 
 const translatedStatuses = computed(() => {
@@ -224,6 +227,7 @@ onMounted(async () => {
     if (props.orderId) {
         let res = await axios.get(`api/order/${props.orderId}`)
         order.value = res.data
+        console.log(order.value)
     }
 
     cart.value = await checkIfProductExists(JSON.parse(order.value.cart))

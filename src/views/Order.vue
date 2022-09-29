@@ -1,11 +1,12 @@
 <template>
     <div class="absolute w-full overflow-hidden overscroll-x-none">
-    <transition appear enter-active-class="-transition transform duration-500 ease-out"
-                enter-from-class="translate-y-full opacity-0">
+<!--    <transition appear enter-active-class="-transition transform duration-500 ease-out"-->
+<!--                enter-from-class="translate-y-full opacity-0">-->
     <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
         <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
         <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} {{ pluralizedGoods }} на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
 
+<!--        <the-mask :mask="['###', '###-#', '###-##']" />-->
         <!-- form -->
         <div class="max-w-screen-sm m-0 m-auto">
             <!-- name, phone -->
@@ -19,7 +20,7 @@
 
                 <div class="mt-6">
                     <label class="text-sm">Телефон:</label>
-                    <input v-model="form.phone" class="input" type="text" @focusout="checkPhone">
+                    <input v-model="form.phone" class="input" type="text" @focusout="checkPhone(form.phone)">
 
                     <div v-if="error.phone" class="text-xs text-mainRed mt-1 absolute">{{ error.phone }}</div>
                 </div>
@@ -121,20 +122,28 @@
             </div>
             </transition>
         </div>
+
+
     </div>
-    </transition>
-
-
+        <!-- Footer -->
+        <transition appear enter-active-class="-transition delay-500 transform duration-500 ease-out"
+                    enter-from-class="translate-y-full opacity-0">
+            <div>
+                <Footer/>
+            </div>
+        </transition>
+<!--    </transition>-->
     </div>
 </template>
 
 <script setup>
+import Footer from "@/components/Footer";
 import Input from "@/components/Input";
 import { computed, onBeforeMount, onMounted, ref, watchEffect } from "vue";
 import { useStore } from 'vuex'
 import { formatPrice, formatTime, pluralize } from '@/functions'
 import axios from "axios";
-import { useRouter } from "vue-router";
+import { useRouter } from "vue-router"
 
 const store = useStore()
 
@@ -149,10 +158,10 @@ const startHour = +workingTime.start.split(':')[0]
 const endHour = +workingTime.end.split(':')[0]
 const form = ref({
     name: '',
-    phone: '+7',
+    phone: '+7 ',
     address: 'Россия, Челябинск, ',
     payment_method: '',
-    delivery_time: '',
+    delivery_time: new Date(),
     comment: '',
     cart: {}
 })
@@ -184,6 +193,11 @@ const nameInput = () => {
     }
 }
 
+const checkPhone = (phone) => {
+    if (phone.length !== 17) error.value.phone = 'Введите корректный номер телефона'
+    else error.value.phone = ''
+}
+
 const handlePickedDate = (date, i) => {
     pickedDate = date
     activeDate.value = i
@@ -194,8 +208,13 @@ const handlePickedDate = (date, i) => {
 
 const handleHours = (date) => {
     activeHour.value = date.getHours()
-    form.value.delivery_time = date
+    // form.value.delivery_time = date // not working in mobile
     paymentHidden.value = false
+
+    let deliveryTime = new Date(form.value.delivery_time).setHours(date.getHours())
+    form.value.delivery_time = new Date(deliveryTime)
+
+    // console.log(new Date(form.value.delivery_time))
 }
 
 const handlePayment = (payment) => {
@@ -253,33 +272,21 @@ const setAvailableHours = () => {
     }
 }
 
-const formatPhone = (phone) => {
-    let cond = phone.replace(/[+()\s\-]*/g, '').length
-    let cond2 = /^[+78][\d\s()-]*$/.test(phone)
+const formatPhone = () => {
+    let cond3 = /^\+7 .*$/.test(form.value.phone)
+    if (!cond3) form.value.phone = `+7 `
 
-    if (cond > 11 || !cond2) {
-        form.value.phone = phone.slice(0, -1)
-    }
-}
-
-const checkPhone = () => {
-    let err = 'Введён неверный номер телефона'
-    let phone = form.value.phone.replace(/[()\s\-]*/g, '')
-    if (phoneRegularExp.test(phone) || /^\+7$/.test(form.value.phone)) {
-        form.value.phone = form.value.phone.replace(phoneRegularExp, '+7 ($2) $3-$4-$5')
-        error.value.phone = false
-    }
-
-    else error.value.phone = err
+    let ph = form.value.phone.replace(/\D/g, '').match(/[+7 ](\d{0,3})(\d{0,3})(\d{0,4})/)
+    form.value.phone = !ph[2] ? '+7 ' + ph[1] : '+7 (' + ph[1] + ') ' + ph[2] + (ph[3] ? '-' + ph[3] : '');
 }
 
 const handleAddressInput = async () => {
     form.value.address = addressInput.value.value
-    error.value.address = await checkAddress()
+    error.value.address = await checkAddress(form.value.address)
 }
 
-const checkIfChosenTimeHasExpired = () => {
-    const chosenDate = form.value.delivery_time
+const checkIfChosenTimeHasExpired = (date) => {
+    const chosenDate = date
 
     const chosenHourPlus = chosenDate.getHours() - 1
     const datesAreTheSame = chosenDate.getDate() === new Date().getDate()
@@ -288,11 +295,11 @@ const checkIfChosenTimeHasExpired = () => {
     return datesAreTheSame && chosenHourPlus < currHour
 }
 
-const checkAddress = async () => {
+const checkAddress = async (address) => {
     let err
     let hint
 
-    await ymaps.geocode(form.value.address).then(function (res) {
+    await ymaps.geocode(address).then(function (res) {
         let obj = res.geoObjects.get(0)
 
         if (obj) {
@@ -332,22 +339,17 @@ const checkAddress = async () => {
 }
 
 const handleSubmit = async () => {
-    if (form.value.name.length < 1) {
-        error.value.name = 'Введите имя'
-    }
+    error.value.name = form.value.name.length < 1 && 'Введите имя'
+    error.value.phone = form.value.phone.length !== 17 && 'Введите корректный номер телефона'
+    error.value.address = await checkAddress(form.value.address) || false
 
-    if (form.value.phone === '+7' || form.value.phone.length < 5) {
-        error.value.phone = 'Введён неверный номер телефона'
-    }
-
-    error.value.address = await checkAddress()
-
-    if (error.value.phone || error.value.address || error.value.name) {
-        window.scrollTo({ top: 150, behavior: 'smooth' });
+    let anyErrors = Object.values(error.value).some(v => v !== false)
+    if (anyErrors) {
+        window.scrollTo({ top: 150, behavior: 'smooth' })
         return
     }
 
-    if (checkIfChosenTimeHasExpired()) {
+    if (checkIfChosenTimeHasExpired(form.value.delivery_time)) {
         expiredTimeErr.value = 'Выбранный временной промежуток уже не достуступен.'
 
         form.value.delivery_time = pickedDate
@@ -359,8 +361,6 @@ const handleSubmit = async () => {
     }
 
     form.value.cart = localStorage.getItem("cart")
-    form.value.delivery_time = formatTime(form.value.delivery_time)
-    console.log(form.value.delivery_time)
 
     await axios.post('api/order', form.value).then(res => {
         router.push({ name: 'ThanksForTheOrder', params: {
@@ -375,11 +375,12 @@ const handleSubmit = async () => {
 }
 
 watchEffect(() => {
-    formatPhone(form.value.phone)
+    formatPhone()
 })
 
 watchEffect(() => {
-    const cond = /^Россия, Челябинск,.*$|.*Челябинск, Россия$/.test(form.value.address)
+    // const cond = /^Россия, Челябинск,.*$|.*Челябинск, Россия$/.test(form.value.address)
+    const cond = /Челябинск/g.test(form.value.address)
     if (!cond) {
         form.value.address = 'Россия, Челябинск, '
     }

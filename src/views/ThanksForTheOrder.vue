@@ -11,7 +11,14 @@
 </template>
 
 <script setup>
-defineProps(['orderId', 'name', 'phone'])
+import { onMounted } from "vue";
+import { useRouter } from "vue-router";
+const router = useRouter()
+
+const props = defineProps(['orderId', 'name', 'phone'])
+onMounted(() => {
+    if (!props.name) router.push('/')
+})
 </script>
 
 <style scoped>

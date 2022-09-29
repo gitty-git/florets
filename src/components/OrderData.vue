@@ -9,7 +9,7 @@
         <!-- created_at -->
         <div class="w-full flex lg:flex-row flex-col lg:my-2 my-6">
             <div class="w-1/3 text-sm md:text-md text-gray-400 mr-6 lg:py-2 lg:my-1">Создан:</div>
-            <div class="lg:py-2 my-1 py-1 flex">{{ computedData }}</div>
+            <div class="lg:py-2 my-1 py-1 flex">{{ computedDate }}</div>
         </div>
 
         <!-- name -->
@@ -26,10 +26,9 @@
             <div class="lg:w-1/3 text-sm md:text-md text-gray-400 mr-6 lg:py-2 lg:my-1">
                 Дата, время доставки:
             </div>
-
-            <input :value="order.delivery_time"
+            <input :value="computedDelivery"
                    @change="handleEmit('delivery_time', $event.target.value)"
-                   type="datetime-local" class="w-fit -ml-2 lg:ml-0 px-2 lg:px-0 py-1 my-1"
+                   type="datetime-local" class="w-fit lg:ml-0 px-2 lg:px-0 py-1 my-1"
             >
         </div>
 
@@ -69,7 +68,7 @@
 <script setup>
 
 import { computed, ref } from "vue";
-import { formatTime, isIsoDate } from "@/functions";
+import { formatTime } from "@/functions";
 import OrderModalInput from "@/components/OrderModalInput"
 
 const props = defineProps(['title', 'type', 'data', 'input', 'status', 'order'])
@@ -86,10 +85,19 @@ const handleEmit = (type, eventValue) => {
     emits('emitOrder', props.order)
 }
 
-const computedData = computed(() => {
+const computedDate = computed(() => {
     let date = new Date(props.order.created_at)
-
     return formatTime(date)
+})
+
+const computedDelivery = computed(() => {
+    let dateTime = new Date(props.order.delivery_time)
+    let date = props.order.delivery_time.split('T')[0]
+    let hours = dateTime.getHours()
+
+    hours = hours.toString().length === 1 && '0' + hours || hours
+
+    return `${date}T${hours}:00`
 })
 
 </script>

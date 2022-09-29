@@ -14,17 +14,23 @@
                 <div class="mb-6">
                     <label class="text-sm">Название:</label>
                     <input v-model="product.name" type="text" class="input">
+
+                    <div v-if="error.name" class="text-sm mt-2 text-mainRed">{{ error.name }}</div>
                 </div>
 
                 <div class="flex w-full">
                     <div class="mb-6 w-full mr-3">
                         <label class="text-sm">Размер:</label>
                         <input v-model="product.size" type="number" class="input">
+
+                        <div v-if="error.size" class="text-sm mt-2 text-mainRed">{{ error.size }}</div>
                     </div>
 
                     <div class="mb-6 w-full ml-3">
                         <label class="text-sm">Цена:</label>
                         <input v-model="product.price" type="number" class="input">
+
+                        <div v-if="error.price" class="text-sm mt-2 text-mainRed">{{ error.price }}</div>
                     </div>
                 </div>
 
@@ -43,7 +49,7 @@
                         <img class="w-16 mr-3 mt-3" v-else :src="product.main_image" alt="">
                     </div>
 
-                    <div class="text-sm text-mainRed">{{ error.mainImage }}</div>
+                    <div v-if="error.mainImage" class="text-sm mt-2 text-mainRed">{{ error.mainImage }}</div>
                 </div>
 
                 <!-- images -->
@@ -57,7 +63,7 @@
                         </div>
                     </div>
 
-                    <div class="text-sm mt-2 text-mainRed">{{ error.images }}</div>
+                    <div v-if="error.images" class="text-sm mt-2 text-mainRed">{{ error.images }}</div>
                 </div>
 
                 <!-- published -->
@@ -118,12 +124,14 @@ const error = ref({})
 const imagesUrls = ref([])
 const imagesToRemove = ref([])
 const product = ref(null)
-const areYouSureModal = ref(false)
+let areYouSureModal = ref(false)
 const hovered = ref(false)
+const submitClicked = ref(false)
+const mainImageFile = ref(null)
 
 onBeforeMount(async () => {
-    let res = await axios.get(`api/products/${props.productId}`)
-    product.value = res.data[0]
+    let res = await axios.get(`api/admin/products/${props.productId}`)
+    product.value = res.data
     product.value.images = JSON.parse(product.value.images)
     product.value.published = product.value.published === 1
     imagesUrls.value = product.value.images
@@ -144,7 +152,7 @@ const handleMainImage = (event) => {
             else {
                 mainImageUrl.value = reader.result
                 imagesToRemove.value.push(product.value.main_image)
-                product.value.main_image = event.target.files[0]
+                mainImageFile.value = event.target.files[0]
                 error.value.mainImage = null
             }
         }
@@ -182,42 +190,52 @@ const removeAllImages = () => {
     imagesUrls.value = []
     imagesToRemove.value = product.value.images
     images.value = []
+    if (images.value.length === 3) {
+        product.value.images = ''
+    }
+}
+
+const checkIfErrors = () => {
+    error.value.name = !product.value.name.length && "Введите имя"
+    error.value.price = product.value.price < 1 && "Введите цену"
+    error.value.size = product.value.size < 1 && "Введите размер"
+    error.value.mainImage = (!mainImageFile.value && !product.value.main_image.length) && 'Выберете 1 картинку'
+    error.value.images = (images.value.length !== 3 && !product.value.images.length) && 'Выберете 3 картинки'
+
+    return !Object.values(error.value).some(v => v !== false)
 }
 
 const submit = async () => {
-    if (!product.value.main_image) {
-        error.value.mainImage = 'Выберете 1 картинку'
-        return
-    }
+    submitClicked.value = true
 
-    if (images.value.length !== 3 && !product.value.images) {
-        error.value.images = 'Выберете 3 картинки'
-        return
-    }
+    if (!checkIfErrors()) return
 
     // remove images
     if (imagesToRemove.value.length) {
         let removeData = new FormData()
         removeData.append('name', product.value.name) // product folder name
 
-        imagesToRemove.value.forEach((img, i) => {
-            removeData.append(`images[${i}]`, img)
-        })
+        if (images.value.length === 3) {
+            imagesToRemove.value.forEach((img, i) => {
+                removeData.append(`images[${i}]`, img)
+            })
+        }
 
         let removedImages = await axios.post(`api/admin/image/delete`, removeData)
+                .catch(err => console.log(err))
     }
 
     // upload new images
     let imgData = new FormData()
     if (product.value.main_image instanceof File) {
-        imgData.append('main_image', product.value.main_image) // img file
+        imgData.append('main_image', mainImageFile.value) // img file
     }
     images.value.forEach((img, i) => {
         imgData.append(`images[${i}]`, img) // image files
     })
-    imgData.append('name', product.value.name) // product folder name
 
     let imgRes = await axios.post(`api/admin/image/add`, imgData)
+            .catch(err => console.log(err))
 
     // update product data
     if (imgRes.data.main_image) product.value.main_image = imgRes.data.main_image
@@ -227,6 +245,7 @@ const submit = async () => {
     else product.value.images = JSON.stringify(product.value.images)
 
     let res = await axios.put(`api/admin/products/${product.value.id}`, product.value)
+            .catch(err => console.log(err))
 
     emits('productToUpdate', res.data)
     emits('setModal', false)
@@ -249,6 +268,12 @@ const removeProduct = async () => {
     emits('productToRemove', product.value)
     emits('setModal', false)
 }
+
+watchEffect(() => {
+    if (submitClicked.value) {
+        checkIfErrors()
+    }
+})
 </script>
 
 <style scoped>

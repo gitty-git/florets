@@ -39,12 +39,11 @@ const translateStatuses = (statuses, pluralized = false) => {
 }
 
 const formatTime = (time) => {
-    // format to '2022-08-16 00:59:50'
-    let left = time.toISOString().slice(0, 10)
-    let right = time.toLocaleString().slice(12, time.toLocaleString().length)
+    let isoTime = time.toISOString()
+    let left = isoTime.split('T')[0]
+    let right = new Date(time).toLocaleString().split(' ')[1]
 
-    return left + ' ' + right
-    // return time.toLocaleString()
+    return (left + ' ' + right).trim()
 }
 
 function isIsoDate(str) {

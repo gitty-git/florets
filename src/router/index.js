@@ -1,22 +1,19 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../views/Home.vue'
+import Product from '../views/Product.vue'
 
 const routes = [
     {
         path: '/',
         name: 'Home',
-        component: () => import(/* webpackChunkName: "about" */ '../views/Home.vue'),
-        meta: {
-            scrollTop: 0
-        },
+        component: Home,
+        meta: {transitionName: 'route-back'},
+        params: true,
     },
     {
         path: '/products/:id',
         name: 'Product',
-        // route level code-splitting
-        // this generates a separate chunk (about.[hash].js) for this route
-        // which is lazy-loaded when the route is visited.
-        component: () => import(/* webpackChunkName: "about" */ '../views/Product.vue')
+        component: Product,
     },
     {
       path:'/cart',
@@ -77,25 +74,24 @@ const routes = [
 ]
 
 const scrollBehavior = (to, from, savedPosition) => {
-    console.log(to.hash)
-    const toHash = to.hash && {el: to.hash, top: 100}
-
-    if (to.name === from.name && !to.hash) {
-        to.meta?.scrollPos && (to.meta.scrollPos.top = 0)
-        return { top: 0 }
-    }
+    // if (to.name === from.name) {
+    //     to.meta?.scrollPos && (to.meta.scrollPos.top = 0)
+    //     return { top: 0 }
+    // }
     const pos = savedPosition || to.meta?.scrollPos || { top: 0 }
+    // const pos = savedPosition
+
+
 
     return new Promise((resolve) => {
         setTimeout(() => {
-            if (to.hash) {
-                resolve({el: to.hash, top: 100})
-            }
-            resolve(pos)
-        }, 500)
-        // setTimeout(() => {
-        //
-        // }, 1000)
+            to.name !== from.name && to.params.hash && resolve({el: to.params.hash, top: 100})
+            // resolve(pos)
+        }, 360)
+        setTimeout(() => {
+            !to.params.hash && resolve(pos)
+            to.name === from.name && to.params.hash && resolve({el: to.params.hash, top: 100, behavior: 'smooth'})
+        }, 120)
     })
 }
 
@@ -106,12 +102,9 @@ const router = createRouter({
     routes
 })
 
-router.beforeEach((to, from, next) => {
-    console.log('window.scrollY:', window.scrollY)
-    from.meta?.scrollTop && (from.meta.scrollTop = window.scrollY)
-    console.log('from:\t', from.name, '\t', from.meta)
-    console.log('to:\t\t', to.name, '\t', to.meta)
-    return next()
-})
+// router.beforeEach((to, from, next) => {
+//     from.meta?.scrollTop && (from.meta.scrollTop = window.scrollY)
+//     return next()
+// })
 
 export default router

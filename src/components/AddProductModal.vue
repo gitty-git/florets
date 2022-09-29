@@ -20,17 +20,22 @@
                         <div class="mb-6">
                             <label class="text-sm">Название:</label>
                             <input v-model="form.name" type="text" class="input">
+
+                            <div v-if="error.name" class="text-sm mt-2 text-mainRed">{{ error.name }}</div>
                         </div>
 
                         <div class="flex w-full">
                             <div class="mb-6 w-full mr-3">
                                 <label class="text-sm">Размер:</label>
                                 <input v-model="form.size" type="number" class="input">
+
+                                <div v-if="error.size" class="text-sm mt-2 text-mainRed">{{ error.size }}</div>
                             </div>
 
                             <div class="mb-6 w-full ml-3">
                                 <label class="text-sm">Цена:</label>
                                 <input v-model="form.price" type="number" class="input">
+                                <div v-if="error.price" class="text-sm mt-2 text-mainRed">{{ error.price }}</div>
                             </div>
                         </div>
 
@@ -48,7 +53,7 @@
                                 <img @click="removeMainImage" class="w-16 mr-3 mt-3" :src="mainImageUrl" alt="">
                             </div>
 
-                            <div class="text-sm text-mainRed">{{ error.mainImage }}</div>
+                            <div v-if="error.mainImage" class="text-sm text-mainRed">{{ error.mainImage }}</div>
                         </div>
 
                         <!-- images -->
@@ -63,7 +68,7 @@
                                 </div>
                             </div>
 
-                            <div class="text-sm mt-2 text-mainRed">{{ error.images }}</div>
+                            <div v-if="error.images" class="text-sm mt-2 text-mainRed">{{ error.images }}</div>
                         </div>
 
                         <!-- published -->
@@ -73,6 +78,9 @@
                                 <label for="default-checkbox" class="ml-2 text-sm">Опубликовать</label>
                             </div>
                         </div>
+
+                        <div>{{ error.imgErr }}</div>
+                        <div>{{ error.postProductErr }}</div>
 
                         <!-- btn -->
                         <div class="btn w-fit mt-12 m-0 m-auto" @click="submit">Добавить</div>
@@ -97,8 +105,8 @@ import { handleImage } from "@/functions";
 const emits = defineEmits(['productToUpdate'])
 const form = ref({
     name: '',
-    size: null,
-    price: null,
+    size: '',
+    price: '',
     description: '',
     published: true,
     main_image: null,
@@ -108,8 +116,10 @@ const images = ref([])
 const file = ref('')
 const error = ref({})
 const mainImageUrl = ref(null)
+const mainImageFile = ref(null)
 const imagesUrls = ref([])
 let addProductModalHidden = ref(true)
+const submitClicked = ref(false)
 
 const removeMainImage = () => {
     mainImageUrl.value = null
@@ -130,7 +140,7 @@ const handleMainImage = (event) => {
             }
             else {
                 mainImageUrl.value = reader.result
-                form.value.main_image = event.target.files[0]
+                mainImageFile.value = event.target.files[0]
                 error.value.mainImage = null
             }
         }
@@ -178,42 +188,69 @@ watchEffect(() => {
     }
 })
 
-const submit = async () => {
-    if (!form.value.main_image) {
-        error.value.mainImage = 'Выберете 1 картинку'
-        return
+watchEffect(() => {
+    if (submitClicked.value) {
+        checkIfErrors()
     }
+})
 
-    if (images.value.length !== 3) {
-        error.value.images = 'Выберете 3 картинки'
-        return
-    }
+const checkIfErrors = () => {
+    error.value.name = !form.value.name.length && "Введите имя"
+    error.value.price = form.value.price < 1 && "Введите цену"
+    error.value.size = form.value.size < 1 && "Введите размер"
+    error.value.mainImage = !mainImageFile.value && 'Выберете 1 картинку'
+    error.value.images = images.value.length !== 3 && 'Выберете 3 картинки'
+
+    return !Object.values(error.value).some(v => v !== false)
+}
+
+const submit = async () => {
+    submitClicked.value = true
+
+    if (!checkIfErrors()) return
+
+    if (Object.values(error.value).some(v => v !== false)) return
 
     // upload new images
     let imgData = new FormData()
-    imgData.append('main_image', form.value.main_image) // main_image file
+    imgData.append('main_image', mainImageFile.value) // main_image file
     images.value.forEach((img, i) => {
         imgData.append(`images[${i}]`, img) // image files
     })
 
     // image paths array in response
     let imgRes = await axios.post(`api/admin/image/add`, imgData)
+        .catch(err => error.value.imgErr = err)
 
     // after creating image files - save product data & image paths
+    console.log(imgRes)
     form.value.main_image = imgRes.data.main_image
     form.value.images = JSON.stringify(imgRes.data.images)
 
-    let res = await axios.post(`api/admin/products`, form.value)
+    await axios.post(`api/admin/products`, form.value)
+        .then(res => {
+            emits('productToUpdate', res.data)
+            addProductModalHidden.value = true
+            images.value = []
 
-    images.value = []
-    Object.keys(form.value).forEach(key => {
-        form.value[key] = null;
-    });
-    imagesUrls.value = []
-    mainImageUrl.value = null
+            form.value.name = ''
+            form.value.size = ''
+            form.value.price = ''
+            form.value.description = ''
+            form.value.published = true
+            form.value.main_image = null
+            form.value.images = ""
 
-    emits('productToUpdate', res.data)
-    addProductModalHidden.value = true
+            imagesUrls.value = []
+            mainImageUrl.value = null
+            submitClicked.value = true
+
+            submitClicked.value = false
+        })
+        .catch(err => {
+            console.log(err)
+            error.value.postProductErr = err
+        })
 }
 </script>
 

@@ -1,16 +1,14 @@
 <template>
     <div id="home">
-        <nav class="uppercase fixed top-0 bg-white z-30 w-full shadow-line">
+        <nav class="uppercase fixed top-0 bg-white z-30 w-screen shadow-line">
             <div class="max-w-screen-xl m-0 m-auto px-6 items-center h-28 flex justify-between">
                 <router-link to="/">
-                    <img class="w-24 ml-0.5 -mt-1.5" :src="require(`@/assets/svg/logo.svg`)" alt="">
+                    <img class="w-24 lg:-ml-1.5 -ml-0.5 -mt-1.5" :src="require(`@/assets/svg/logo.svg`)" alt="">
                 </router-link>
 
                 <div v-if="!user" class="text-xs items-center lg:visible lg:flex lg:static absolute invisible">
-<!--                    <div class="mr-12 cursor-pointer" @click="goTo('bouquets')">Букеты</div>-->
-<!--                    <div class="mr-12 cursor-pointer" @click="goTo('about')">О нас</div>-->
-                    <router-link class="mr-12" to="/#bouquets">Букеты</router-link>
-                    <router-link class="mr-12" to="/#about">О нас</router-link>
+                    <router-link class="mr-12" :to="{name: 'Home', params: { hash: '#bouquets' }}">Букеты</router-link>
+                    <router-link class="mr-12" :to="{name: 'Home', params: { hash: '#about' }}">О нас</router-link>
                     <div class="border-r-2 mr-12 h-8 border-gray-150"></div>
                         <router-link :to="{ name: 'Cart' }" class="flex items-center">
                             <div class="mr-3 mb-1">
@@ -54,7 +52,7 @@
                         </div>
                     </router-link>
 
-                    <div v-show="!isClicked" @click="handeClick" class="p-2">
+                    <div @click="handeClick" class="p-2">
                         <svg width="24" height="24" viewBox="0 0 19 13" fill="none" xmlns="http://www.w3.org/2000/svg">
                             <line x1="-2.91409e-08" y1="0.75" x2="19" y2="0.749999" stroke="black" stroke-width="0.5"/>
                             <line x1="-2.91409e-08" y1="6.75" x2="19" y2="6.75" stroke="black" stroke-width="0.5"/>
@@ -66,54 +64,59 @@
             </div>
         </nav>
 
-        <div class="overflow-hidden mt-20">
+        <div class="mt-20">
             <router-view v-slot="{ Component, route }">
-<!--                <keep-alive include="Home">-->
-                <transition name="route" >
-                    <component :is="Component" :key="route.path"/>
+                <keep-alive include="Home">
+                <transition :name="route.meta.transitionName || 'route'" >
+                    <component :is="Component"/>
                 </transition>
-<!--                </keep-alive>-->
+                </keep-alive>
             </router-view>
         </div>
 
         <!-- mobile menu -->
         <transition appear
-                    enter-active-class="duration-500 ease-out"
+                    enter-active-class="duration-500 linear"
                     enter-from-class="-translate-y-full"
-                    leave-active-class="duration-200 ease-out"
+                    leave-active-class="duration-200 linear"
                     leave-to-class="-translate-y-full"
         >
             <div v-if="isClicked"
-                 class="blurred shadow-md z-50 fixed w-full py-24 top-0 right-0 text-2xl flex flex-col items-center">
+                 class="bg-gray-200 shadow-md z-50 fixed w-full py-24 top-0 right-0 text-2xl flex flex-col items-center">
                 <div class="mb-12 p-4 font-black" @click="isClicked = !isClicked">&#9587;</div>
 
                 <!-- if no user -->
-                <div v-if="!user" @click.stop="isClicked = !isClicked" class="mb-12">
-                    <router-link to="/#bouquets">Букеты</router-link>
+                <div v-if="!user" class="flex flex-col items-center">
+                    <div @click.stop="isClicked = !isClicked" class="mb-12">
+                        <router-link to="/#bouquets">Букеты</router-link>
+                    </div>
+
+                    <div @click.stop="isClicked = !isClicked" class="mb-12">
+                        <router-link to="/#about">О нас</router-link>
+                    </div>
+
+                    <div @click.stop="isClicked = !isClicked">
+                        <router-link :to="{ name: 'Cart' }">Корзина ({{ formatPrice(itemsInCart.price) }} ₽)</router-link>
+                    </div>
                 </div>
 
-                <div v-if="!user" @click.stop="isClicked = !isClicked" class="mb-12">
-                    <router-link to="/#about">О нас</router-link>
-                </div>
-
-                <div v-if="!user" @click.stop="isClicked = !isClicked">
-                    <router-link :to="{ name: 'Cart' }">Корзина ({{ formatPrice(itemsInCart.price) }} ₽)</router-link>
-                </div>
 
                 <!-- if user -->
-                <div v-if="user" @click.stop="isClicked = !isClicked" class="mb-12">
-                    <router-link :to="`/${user.role}/orders`">Заказы</router-link>
-                </div>
+                <div v-if="user" class="flex flex-col items-center">
+                    <div @click.stop="isClicked = !isClicked" class="mb-12">
+                        <router-link :to="`/${user.role}/orders`">Заказы</router-link>
+                    </div>
 
-                <div v-if="user" @click.stop="isClicked = !isClicked" class="mb-12">
-                    <router-link :to="`/${user.role}/products`">Букеты</router-link>
-                </div>
+                    <div @click.stop="isClicked = !isClicked" class="mb-12">
+                        <router-link :to="`/${user.role}/products`">Букеты</router-link>
+                    </div>
 
-                <div v-if="user" @click.stop="isClicked = !isClicked">
-                    <router-link v-if="user.role === 'admin'" to="#">Сотрудники</router-link>
-                </div>
+                    <div @click.stop="isClicked = !isClicked" class="mb-12">
+                        <router-link v-if="user.role === 'admin'" to="#">Сотрудники</router-link>
+                    </div>
 
-                <div class="cursor-pointer" @click="handleLogout">Выйти</div>
+                    <div class="cursor-pointer" @click="handleLogout">Выйти</div>
+                </div>
             </div>
         </Transition>
 
@@ -123,9 +126,7 @@
 </template>
 
 <script setup>
-import HomeView from "@/views/Home"
-import { shallowRef } from 'vue'
-import { computed, onMounted, ref, watchEffect } from "vue";
+import { computed, onMounted, ref } from "vue";
 import { useStore } from 'vuex'
 import { formatPrice } from "@/functions";
 import useAuth from "@/composables/useAuth";
@@ -137,32 +138,9 @@ let isClicked = ref(false)
 const { error, fetchUser, logout } = useAuth()
 const store = useStore()
 const router = useRouter()
-const productsLoaded = ref(null)
 
 const handeClick = () => {
     isClicked.value = !isClicked.value
-}
-
-// const doSomething = (v) => {
-//     window.scrollTo(0, v.bouquetsTop + 200)
-//     productsLoaded.value = v
-//     console.log(productsLoaded.value)
-// }
-
-const goTo = (v) => {
-    // productsLoaded.value
-    // let route = `/#${v}`
-    // console.log(route)
-    // router.push(`/#${v}`)
-
-    // setTimeout(() => {
-    //     let el = document.getElementById(v)
-    //     el.scrollIntoView()
-    //     console.log(el)
-    // }, 1000)
-
-    // el.scrollIntoView()
-    // router.push(v)
 }
 
 const itemsInCart = computed(() => store.state.cart.items)
@@ -185,11 +163,6 @@ const handleLogout = async () => {
     await router.push('/')
 }
 
-// const handleLogout = async () => {
-//     await logout()
-//     await router.push('/')
-// }
-
 onMounted(() => {
     fetchUser()
             .then(res => store.dispatch('setUser', res.data))
@@ -208,14 +181,28 @@ onMounted(() => {
     transform: translateX(100%);
 }
 .route-enter-active {
-    transition: all 0.5s ease-out;
+    transition: transform 0.3s ease-out, opacity 0.3s linear;
 }
 .route-leave-to {
     opacity: 0;
     transform: translateX(-100%);
 }
 .route-leave-active {
-    transition: all 0.5s ease-out;
+    transition: transform 0.3s linear, opacity 0.1s ease-out;
+}
+.route-back-enter-from {
+    opacity: 0;
+    transform: translateX(-100%);
+}
+.route-back-enter-active {
+    transition: transform 0.3s linear, opacity 0.1s ease-out;
+}
+.route-back-leave-to {
+    opacity: 0;
+    transform: translateX(100%);
+}
+.route-back-leave-active {
+    transition: transform 0.3s linear, opacity 0.1s ease-out;
 }
 .blurred {
     background: rgb(255, 255, 255, 0.6);
