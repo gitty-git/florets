@@ -3,5 +3,6 @@ module.exports = defineConfig({
   transpileDependencies: true,
   pwa: {
     name: 'Florets',
+    themeColor: '#ffffff'
   }
 })

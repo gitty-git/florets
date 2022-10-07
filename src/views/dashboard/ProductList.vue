@@ -1,6 +1,6 @@
 <template>
-    <div>
-    <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
+    <div class="w-full items-center flex flex-col">
+        <div class="px-6 pt-16 pb-20 w-full max-w-screen-xl">
         <div class="mb-12 flex -ml-0.5 sm:items-center flex-col sm:flex-row">
             <div class="sm:mr-6 font-display text-2xl sm:text-4xl">
                 Список букетов

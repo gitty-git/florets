@@ -1,7 +1,21 @@
 <template>
-    <div>
-        <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
-            <div class="font-display -ml-0.5 text-2xl lg:text-4xl">Список заказов</div>
+    <div class="w-full items-center flex flex-col">
+        <div class="px-6 pt-16 pb-20 w-full max-w-screen-xl">
+            <div class="flex -ml-0.5 sm:items-center flex-col sm:flex-row">
+                <div class="sm:mr-6 font-display text-2xl sm:text-4xl">
+                    Список заказов
+                </div>
+                <div class="mt-3 mb-6 sm:m-0">
+                    <div @click="reload" v-if="!reloading"
+                         class="w-fit sm:-mt-4 absolute text-sm cursor-pointer px-3 py-2 rounded border-gray-150 border-2">
+                        Обновить
+                    </div>
+                    <div v-else class="w-fit sm:-mt-4 text-gray-400 absolute text-sm cursor-pointer px-3.5 py-2.5">
+                        Загрузка...
+                    </div>
+                </div>
+            </div>
+
 
             <div class="flex pt-12 flex-wrap" v-if="orders && computedOrders.length > 0">
                 <div class="mr-6 text-gray-400 mb-4 text-sm uppercase cursor-pointer"
@@ -68,19 +82,17 @@
 import Footer from '@/components/Footer'
 import { computed, onMounted, ref } from "vue";
 import axios from "axios";
-import { useStore } from "vuex";
 import OrderModal from "@/components/OrderModal"
 import { translateStatuses } from "@/functions";
-
-const store = useStore()
 
 const orders = ref(null)
 const user = ref(null)
 const orderId = ref(null)
 const modalHidden = ref(true)
-const activeCategory = ref('all')
+const activeCategory = ref('created')
 const total = ref(0)
 const rawStatuses = ref(["created", "processed", "sent", "received", "canceled",])
+const reloading = ref(false)
 
 const categoryStatus = ref([])
 
@@ -124,13 +136,20 @@ const prevPage = async () => {
     }
 }
 
+const reload = async () => {
+    reloading.value = true
+    await axios.get(`api/orders/all`).then(res => {
+        orders.value = res.data
+        reloading.value = false
+    })
+
+}
+
 onMounted(async () => {
     categoryStatus.value = [...translateStatuses(['all', ...rawStatuses.value], true)]
 
     let res = await axios.get(`api/orders/all`)
     orders.value = res.data
-
-    user.value = store.getters.getUser
 })
 </script>
 

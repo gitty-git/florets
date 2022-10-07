@@ -1,6 +1,6 @@
 <template>
-    <div class="absolute w-full">
-        <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
+    <div class="w-full flex justify-center">
+        <div class="px-6 pt-16 pb-20 w-full max-w-screen-xl">
             <div class="mb-3 -ml-3 flex p-3 cursor-pointer text-gray-500" @click="router.go(-1)">
                 <svg class="mr-3 fill-gray-400" width="32" viewBox="0 0 98 24" fill="none"
                      xmlns="http://www.w3.org/2000/svg">
@@ -102,13 +102,11 @@
                 </div>
             </transition>
         </div>
-        <transition appear enter-active-class="-transition delay-500 transform duration-500 ease-out"
-                    enter-from-class="translate-y-full opacity-0">
-            <div>
-                <Footer/>
-            </div>
-        </transition>
     </div>
+
+    <transition appear enter-active-class="delay-500 transform duration-500 ease-out" enter-from-class="translate-y-full opacity-0">
+        <div><Footer/></div>
+    </transition>
 </template>
 
 <script setup>

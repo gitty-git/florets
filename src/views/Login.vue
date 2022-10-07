@@ -1,6 +1,6 @@
 <template>
-    <div class="max-w-screen-xl pt-16 pb-20 m-0 m-auto">
-        <div class="mx-6">
+    <div class="pt-16 pb-20 flex justify-center w-full">
+        <div class="mx-6 max-w-screen-xl">
             <div class="font-display -ml-1.5 text-2xl lg:text-4xl">Войти как администратор или сотрудник</div>
 
             <div class="w-full sm:py-32 py-12 flex flex-col items-center justify-center">

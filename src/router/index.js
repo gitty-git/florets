@@ -79,19 +79,18 @@ const scrollBehavior = (to, from, savedPosition) => {
     //     return { top: 0 }
     // }
     const pos = savedPosition || to.meta?.scrollPos || { top: 0 }
-    // const pos = savedPosition
+    // let behavior = to.name === from.name && to.params.hash && 'smooth' || 'auto'
+    // return !to.params.hash && pos || {el: to.params.hash, top: 100, behavior}
 
 
 
     return new Promise((resolve) => {
         setTimeout(() => {
             to.name !== from.name && to.params.hash && resolve({el: to.params.hash, top: 100})
-            // resolve(pos)
-        }, 360)
-        setTimeout(() => {
             !to.params.hash && resolve(pos)
-            to.name === from.name && to.params.hash && resolve({el: to.params.hash, top: 100, behavior: 'smooth'})
-        }, 120)
+        }, 10)
+
+        to.name === from.name && to.params.hash && resolve({el: to.params.hash, top: 100, behavior: 'smooth'})
     })
 }
 

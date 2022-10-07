@@ -1,139 +1,142 @@
 <template>
-    <div class="absolute w-full overflow-hidden overscroll-x-none">
-<!--    <transition appear enter-active-class="-transition transform duration-500 ease-out"-->
-<!--                enter-from-class="translate-y-full opacity-0">-->
-    <div class="px-6 m-0 pt-16 pb-20 m-auto max-w-screen-xl">
-        <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
-        <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} {{ pluralizedGoods }} на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
+    <div class="flex justify-center w-full overflow-hidden overscroll-x-none">
+        <div class="px-6 pt-16 pb-20 max-w-screen-xl">
+            <div class="font-display text-2xl lg:text-4xl">Оформление заказа</div>
+            <div class="font-sm text-gray-400 mt-4 mb-12">{{ itemsInCart.amount }} {{ pluralizedGoods }} на сумму {{ formatPrice(itemsInCart.price) }} ₽</div>
 
-<!--        <the-mask :mask="['###', '###-#', '###-##']" />-->
-        <!-- form -->
-        <div class="max-w-screen-sm m-0 m-auto">
-            <!-- name, phone -->
-            <div class="grid md:grid-cols-2 gap-x-3">
-                <div class="mt-6">
-                    <label class="text-sm">Имя:</label>
-                    <input v-model="form.name" @keyup="nameInput" class="input" type="text">
+            <!-- form -->
+            <div class="max-w-screen-sm w-full justify-center">
+                <!-- name, phone -->
+                <div class="grid md:grid-cols-2 gap-x-3">
+                    <div class="mt-6">
+                        <label class="text-sm">Имя:</label>
+                        <input v-model="form.name" @keyup="nameInput" class="input" type="text">
 
-                    <div v-if="error.name" class="text-xs text-mainRed mt-1 absolute">{{ error.name }}</div>
-                </div>
-
-                <div class="mt-6">
-                    <label class="text-sm">Телефон:</label>
-                    <input v-model="form.phone" class="input" type="text" @focusout="checkPhone(form.phone)">
-
-                    <div v-if="error.phone" class="text-xs text-mainRed mt-1 absolute">{{ error.phone }}</div>
-                </div>
-            </div>
-
-            <!-- address -->
-            <div class="mt-12">
-                <label class="text-sm">Улица, дом:</label>
-                <div @click="handleAddressInput" @focusout="handleAddressInput" @keyup="handleAddressInput" @input="handleAddressInput">
-                    <input v-model="form.address" id="inputAddress" ref="addressInput" class="input" type="text">
-                </div>
-
-                <div v-if="error.address" class="text-xs text-mainRed mt-1 absolute">{{ error.address }}</div>
-            </div>
-
-            <!-- comment -->
-            <div class="mt-12">
-                <label class="text-sm">Комментарий к заказу / пожелания в открытке:</label>
-                <div @click="handleAddressInput" @focusout="handleAddressInput" @keyup="handleAddressInput" @input="handleAddressInput">
-                    <textarea v-model="form.comment" rows="3" class="w-full my-2 px-3 py-2 font-serif border-2 border-gray-150" type="text"/>
-                </div>
-            </div>
-
-            <!-- date -->
-            <transition appear enter-active-class="-transition transform duration-500 ease-out"
-                        enter-from-class="translate-y-full opacity-0">
-                <div v-if="dates.length" class="flex flex-col justify-center items-center mt-12">
-                <div class="w-full pr-12 text-sm">Выберете желаемую дату доставки:</div>
-
-                <div class="grid grid-cols-7 gap-6 w-full mt-6">
-                    <div v-for="day in weekdays" class="text-xs text-gray-400 flex justify-center items-center">
-                        {{ day }}
+                        <div v-if="error.name" class="text-xs text-mainRed mt-1 absolute">{{ error.name }}</div>
                     </div>
 
-                    <div class="flex font-medium justify-center items-center"
-                         v-for="(data, i) in dates" :key="i"
-                    >
-                        <div v-if="data.available" class="cursor-pointer flex items-end">
-                            <div @click="handlePickedDate(data.date, i)" class="text-xl w-14 h-14 rounded-full flex justify-center items-center"
-                                 :class="{'border-mainRed border-2 text-mainRed' : activeDate === i}"
+                    <div class="mt-6">
+                        <label class="text-sm">Телефон:</label>
+                        <input v-model="form.phone" class="input" type="text" @focusout="checkPhone(form.phone)">
+
+                        <div v-if="error.phone" class="text-xs text-mainRed mt-1 absolute">{{ error.phone }}</div>
+                    </div>
+                </div>
+
+                <!-- address -->
+                <div class="mt-12">
+                    <label class="text-sm">Улица, дом:</label>
+                    <div @click="handleAddressInput" @focusout="handleAddressInput" @keyup="handleAddressInput"
+                         @input="handleAddressInput">
+                        <input v-model="form.address" id="inputAddress" ref="addressInput" class="input" type="text">
+                    </div>
+
+                    <div v-if="error.address" class="text-xs text-mainRed mt-1 absolute">{{ error.address }}</div>
+                </div>
+
+                <!-- comment -->
+                <div class="mt-12">
+                    <label class="text-sm">Комментарий к заказу / пожелания в открытке:</label>
+                    <div @click="handleAddressInput" @focusout="handleAddressInput" @keyup="handleAddressInput"
+                         @input="handleAddressInput">
+                        <textarea v-model="form.comment" rows="3"
+                                  class="w-full my-2 px-3 py-2 font-serif border-2 border-gray-150" type="text"/>
+                    </div>
+                </div>
+
+                <!-- dates -->
+                <transition appear enter-active-class="transition transform duration-500 ease-out"
+                            enter-from-class="translate-y-full opacity-0">
+                    <div v-if="dates.length" class="flex flex-col justify-center items-center mt-12">
+                        <div class="w-full pr-12 text-sm">Выберете желаемую дату доставки:</div>
+
+                        <div class="grid grid-cols-7 gap-6 w-full mt-6">
+                            <div v-for="day in weekdays" class="text-xs text-gray-400 flex justify-center items-center">
+                                {{ day }}
+                            </div>
+
+                            <div class="flex font-medium justify-center items-center"
+                                 v-for="(data, i) in dates" :key="i"
                             >
-                                {{ data.date.getDate() }}
-                            </div>
-                        </div>
+                                <div v-if="data.available" class="cursor-pointer flex items-end">
+                                    <div @click="handlePickedDate(data.date, i)"
+                                         class="text-xl w-14 h-14 rounded-full flex justify-center items-center"
+                                         :class="{'border-mainRed border-2 text-mainRed' : activeDate === i}"
+                                    >
+                                        {{ data.date.getDate() }}
+                                    </div>
+                                </div>
 
-                        <div v-else class="flex items-end">
-                            <div class="text-xl text-gray-300">
-                                {{ data.date.getDate() }}
+                                <div v-else class="flex items-end">
+                                    <div class="text-xl text-gray-300">
+                                        {{ data.date.getDate() }}
+                                    </div>
+                                </div>
                             </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            </transition>
+                </transition>
 
-
-            <!-- time -->
-            <transition appear enter-active-class="-transition transform duration-500 ease-out"
-                        enter-from-class="translate-y-full opacity-0">
-            <div v-if="!availableHoursHidden" class="flex flex-col justify-center items-center mt-12">
-                <div class="w-full pr-12 text-sm">Выберете желаемое время доставки:</div>
-                <div class="mt-6 grid font-medium grid-cols-2 sm:grid-cols-4 gap-3">
-                    <div v-for="(date, i) in availableHours" :key="i"
-                    >
-                        <div :class="{'border-mainRed text-mainRed': date.getHours() === activeHour}" @click="handleHours(date, i)"
-                             class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 flex justify-center">
-                            {{ date.getHours() }}:00 - {{ date.getHours() + 2 === 24 ? '00' : date.getHours() + 2 }}:00
+                <!-- time -->
+                <transition appear enter-active-class="transition transform duration-500 ease-out"
+                            enter-from-class="translate-y-full opacity-0">
+                    <div v-if="!availableHoursHidden" class="flex flex-col justify-center items-center mt-12">
+                        <div class="w-full pr-12 text-sm">Выберете желаемое время доставки:</div>
+                        <div class="mt-6 grid font-medium grid-cols-2 sm:grid-cols-4 gap-3">
+                            <div v-for="(date, i) in availableHours" :key="i"
+                            >
+                                <div :class="{'border-mainRed text-mainRed': date.getHours() === activeHour}"
+                                     @click="handleHours(date, i)"
+                                     class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 flex justify-center">
+                                    {{ date.getHours() }}:00 - {{ date.getHours() + 2 === 24 ? '00' : date.getHours() + 2 }}:00
+                                </div>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
-            </transition>
+                </transition>
 
-            <transition appear enter-active-class="-transition transform duration-500 ease-out"
-                        enter-from-class="translate-y-full opacity-0">
-            <!-- payment -->
-            <div v-if="!paymentHidden" class="flex flex-col justify-center items-center mt-12">
-                <div class="w-full pr-12 text-sm">Выберете способ оплаты:</div>
-                <div class="flex mt-6 font-medium">
-                    <div @click="handlePayment('cash')"
-                         :class="{'border-mainRed text-mainRed': activePayment === 'cash'}"
-                         class="cursor-pointer mr-3 px-4 py-2 rounded-full border-2 border-gray-150 uppercase">Наличными</div>
-                    <div @click="handlePayment('card')"
-                         :class="{'border-mainRed text-mainRed' : activePayment === 'card'}"
-                         class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 uppercase">Картой</div>
-                </div>
-            </div>
-            </transition>
+                <!-- payment -->
+                <transition appear enter-active-class="transition transform duration-500 ease-out"
+                            enter-from-class="translate-y-full opacity-0">
 
-            <div class="w-full left-0 absolute mt-6 text-sm flex justify-center text-mainRed">{{ expiredTimeErr }}</div>
+                    <div v-if="!paymentHidden" class="flex flex-col justify-center items-center mt-12">
+                        <div class="w-full pr-12 text-sm">Выберете способ оплаты:</div>
+                        <div class="flex mt-6 font-medium">
+                            <div @click="handlePayment('cash')"
+                                 :class="{'border-mainRed text-mainRed': activePayment === 'cash'}"
+                                 class="cursor-pointer mr-3 px-4 py-2 rounded-full border-2 border-gray-150 uppercase">Наличными
+                            </div>
+                            <div @click="handlePayment('card')"
+                                 :class="{'border-mainRed text-mainRed' : activePayment === 'card'}"
+                                 class="cursor-pointer px-4 py-2 rounded-full border-2 border-gray-150 uppercase">Картой
+                            </div>
+                        </div>
+                    </div>
+                </transition>
 
-            <transition appear enter-active-class="-transition transform duration-500 ease-out"
-                        enter-from-class="translate-y-full opacity-0">
-            <!-- submit -->
-            <div v-if="!submitHidden" class="w-full flex mt-16 justify-center" >
-                <div @click="handleSubmit" class="btn">
-                    Подтвердить
-                </div>
+                <div class="w-full left-0 absolute mt-6 text-sm flex justify-center text-mainRed">{{ expiredTimeErr }}</div>
+
+                <transition appear enter-active-class="transition transform duration-500 ease-out"
+                            enter-from-class="translate-y-full opacity-0">
+                    <!-- submit -->
+                    <div v-if="!submitHidden" class="w-full flex mt-16 justify-center">
+                        <div @click="handleSubmit" class="btn">
+                            Подтвердить
+                        </div>
+                    </div>
+                </transition>
             </div>
-            </transition>
         </div>
-
-
     </div>
-        <!-- Footer -->
-        <transition appear enter-active-class="-transition delay-500 transform duration-500 ease-out"
-                    enter-from-class="translate-y-full opacity-0">
-            <div>
-                <Footer/>
-            </div>
-        </transition>
-<!--    </transition>-->
-    </div>
+
+    <!-- Footer -->
+    <transition appear enter-active-class="delay-1000 transform duration-500 ease-out"
+                enter-from-class="translate-y-full opacity-0">
+        <div>
+            <Footer/>
+        </div>
+    </transition>
+
 </template>
 
 <script setup>
@@ -152,7 +155,7 @@ const notice = ref('')
 const dates = ref([])
 const timePeriods = ref([])
 const availableHoursHidden = ref(true)
-const workingTime = {start: '09:00', end: '23:59'}
+const workingTime = { start: '09:00', end: '23:59' }
 const workingHours = ref(null)
 const startHour = +workingTime.start.split(':')[0]
 const endHour = +workingTime.end.split(':')[0]
@@ -257,7 +260,7 @@ const setAvailableHours = () => {
     let hours
     let availableHour
 
-    if (pickedDate < opens) {
+    if (pickedDate < closes) {
         availableHour = new Date().getHours() + 1
         hours = Math.ceil((closes - currDate) / 60 / 60 / 1000) - 1
     }
@@ -266,9 +269,13 @@ const setAvailableHours = () => {
         hours = Math.ceil((closes - opens) / 60 / 60 / 1000)
     }
 
+    // console.log(opens.getHours(), "asdf", hours)
+
+    let datesHours
+
     for (let i = 1; i < hours - 1; i++) {
         let date = new Date(pickedDate.setHours(availableHour + i, 0, 0, 0))
-        availableHours.value.push(date)
+        if (date.getHours() > opens.getHours()) availableHours.value.push(date)
     }
 }
 
@@ -322,7 +329,8 @@ const checkAddress = async (address) => {
                     err = 'Неточный адрес, требуется уточнение';
                     hint = 'Уточните адрес';
             }
-        } else {
+        }
+        else {
             err = 'Адрес не найден';
             hint = 'Уточните адрес';
         }
@@ -330,7 +338,8 @@ const checkAddress = async (address) => {
         // Если геокодер возвращает пустой массив или неточный результат, то показываем ошибку.
         if (err) {
             return err
-        } else {
+        }
+        else {
             return null
         }
     })
@@ -363,13 +372,15 @@ const handleSubmit = async () => {
     form.value.cart = localStorage.getItem("cart")
 
     await axios.post('api/order', form.value).then(res => {
-        router.push({ name: 'ThanksForTheOrder', params: {
-            orderId: res.data.id,
-            name: form.value.name,
-            phone: form.value.phone
-        }})
+        router.push({
+            name: 'ThanksForTheOrder', params: {
+                orderId: res.data.id,
+                name: form.value.name,
+                phone: form.value.phone
+            }
+        })
 
-        store.dispatch('setCart', {amount: 0, price: 0})
+        store.dispatch('setCart', { amount: 0, price: 0 })
         localStorage.removeItem("cart")
     })
 }
