@@ -48,7 +48,7 @@
             </div>
         </div>
 
-        <div v-else>Пока не букетов</div>
+            <div v-else class="mt-12 text-gray-400">Нет продуктов...</div>
     </div>
     <Footer/>
     </div>

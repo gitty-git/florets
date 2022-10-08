@@ -1,6 +1,6 @@
 <template>
-    <div v-if="orderId" class="m-0 h-screen m-auto max-w-screen-xl">
-        <div class="absolute top-1/2 -mt-20 px-6">
+    <div v-if="orderId" class="h-screen w-full relative flex justify-center">
+        <div class="absolute max-w-screen-xl w-full top-1/3 px-6">
             <div class="text-5xl sm:text-6xl font-display mb-6">
                 {{ name }}, спасибо за Ваш заказ!
             </div>
@@ -9,7 +9,6 @@
                 <span class="font-medium uppercase">{{ phone }}</span> для его подтвержденя.
             </div>
         </div>
-
     </div>
 
     <!-- Footer -->

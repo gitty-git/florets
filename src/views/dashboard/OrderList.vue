@@ -66,7 +66,7 @@
                 </div>
             </div>
 
-            <div v-else class="mt-6">Нет заказов...</div>
+            <div v-else class="mt-12 text-gray-400">Нет заказов...</div>
 
             <OrderModal @modalHidden="showOrderModal" @order="updateOrders" :modalHidden="modalHidden"
                         v-if="!modalHidden" :orderId="orderId"/>
@@ -138,7 +138,7 @@ const prevPage = async () => {
 
 const reload = async () => {
     reloading.value = true
-    await axios.get(`api/orders/all`).then(res => {
+    await axios.get(`api/orders/${activeCategory.value}`).then(res => {
         orders.value = res.data
         reloading.value = false
     })
@@ -148,7 +148,7 @@ const reload = async () => {
 onMounted(async () => {
     categoryStatus.value = [...translateStatuses(['all', ...rawStatuses.value], true)]
 
-    let res = await axios.get(`api/orders/all`)
+    let res = await axios.get(`api/orders/${activeCategory.value}`)
     orders.value = res.data
 })
 </script>

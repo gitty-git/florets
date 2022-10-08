@@ -91,7 +91,7 @@
                     <!-- btn -->
                     <div class="w-full flex mt-16 justify-center">
                         <div class="my-24 mb-32" v-if="!products.length">
-                            <router-link to="/#bouquets">
+                            <router-link :to="{name: 'Home', params: { hash: '#bouquets' }}">
                                 <div class="btn">Выбрать букет</div>
                             </router-link>
                         </div>
