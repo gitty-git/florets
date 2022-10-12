@@ -1,6 +1,6 @@
 <template>
     <div v-if="!modalHidden" class="left-0 flex justify-center items-center w-full h-full">
-        <div v-if="order" class="z-40 bg-white w-full fixed section overflow-y-scroll sm:left-auto bottom-6 left-0 top-6 xl:w-2/3 md:w-5/6 2xl:w-1/2 bg-white">
+        <div v-if="order" class="z-40 pb-6 bg-white w-full fixed section overflow-y-scroll sm:left-auto bottom-10 left-0 top-10 xl:w-2/3 md:w-5/6 2xl:w-1/2 bg-white">
             <div class="w-full flex justify-end">
                 <div @click="$emit('modalHidden')" class="cursor-pointer p-6">&#9587;</div>
             </div>
@@ -98,10 +98,16 @@
 
                 <div class="w-full flex justify-center text-mainRed text-sm">{{ error.message }}</div>
 
-                <div class="w-full py-6 justify-center flex">
-                    <div class="btn text-sm" @click="save">Сохранить изменения</div>
+                <div class="w-full py-3 justify-center flex">
+                    <div v-show="loading" class="py-6 px-12">
+                        <svg class="animate-spin" width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M8 16C6.41775 16 4.87103 15.5308 3.55544 14.6518C2.23984 13.7727 1.21446 12.5233 0.608964 11.0615C0.00346254 9.59966 -0.154964 7.99112 0.153718 6.43928C0.4624 4.88743 1.22433 3.46197 2.34315 2.34315C3.46197 1.22433 4.88743 0.462399 6.43928 0.153718C7.99113 -0.154964 9.59966 0.00346288 11.0615 0.608964C12.5233 1.21447 13.7727 2.23985 14.6518 3.55544C15.5308 4.87103 16 6.41775 16 8L14.2821 8C14.2821 6.75751 13.9137 5.54293 13.2234 4.50983C12.5331 3.47674 11.552 2.67154 10.4041 2.19606C9.25616 1.72058 7.99303 1.59618 6.77442 1.83857C5.5558 2.08097 4.43643 2.67929 3.55786 3.55786C2.67929 4.43643 2.08097 5.5558 1.83858 6.77442C1.59618 7.99303 1.72058 9.25616 2.19606 10.4041C2.67154 11.552 3.47674 12.5331 4.50983 13.2234C5.54292 13.9137 6.75751 14.2821 8 14.2821L8 16Z" fill="#747474"/>
+                        </svg>
+                    </div>
+                    <div v-show="!loading" class="btn text-sm" @click="save">
+                        <div>Сохранить изменения</div>
+                    </div>
                 </div>
-
             </div>
         </div>
 
@@ -128,6 +134,7 @@ const cart = ref([])
 const rawStatuses = ref([
     'created', 'processed', 'sent', 'received', 'canceled'
 ])
+const loading = ref(false)
 
 let cachedOrder = {}
 
@@ -181,8 +188,10 @@ const save = async () => {
     if (!order.value.name || !order.value.phone || !order.value.address) {
         error.value.message = `Поля "Имя", "Телефон" и "Адрес" обязательны для заполнения`
     }
+    loading.value = true
     await axios.put(`api/orders/${order.value.id}`, order.value)
             .then(res => {
+                loading.value = false
                 emits('modalHidden', false)
                 emits('order', order.value)
             })
@@ -227,7 +236,6 @@ onMounted(async () => {
     if (props.orderId) {
         let res = await axios.get(`api/order/${props.orderId}`)
         order.value = res.data
-        console.log(order.value)
     }
 
     cart.value = await checkIfProductExists(JSON.parse(order.value.cart))

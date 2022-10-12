@@ -26,11 +26,6 @@ const routes = [
         component: () => import('../views/Order')
     },
     {
-        path:'/register',
-        name: 'Register',
-        component: () => import('../views/Register')
-    },
-    {
         path:'/login',
         name: 'Login',
         component: () => import('../views/Login')
@@ -49,11 +44,6 @@ const routes = [
         path:'/:role/orders',
         name: 'OrderList',
         component: () => import('../views/dashboard/OrderList')
-    },
-    {
-        path:'/:role/orders/:id',
-        name: 'ViewOrder',
-        component: () => import('../views/dashboard/ViewOrder')
     },
     {
         path:'/:role/products',

@@ -12,6 +12,7 @@ const login = async (email, password) => {
         .catch(err => {
             console.log(err)
             if (err.response.status === 422) error.value = 'Пароль/логин не совпадают с нашими записями'
+            if (err.response.status === 429) error.value = 'Слишком много попыток. Попробуйте немного позже'
         })
 }
 
@@ -23,7 +24,9 @@ const logout = async () => {
 
 const fetchUser = async () => {
     // await axios.get('/sanctum/csrf-cookie')
-    return await axios.get('api/user')
+    return await axios.get('api/user').catch(err => {
+        //
+    })
 }
 
 const useAuth = () => {

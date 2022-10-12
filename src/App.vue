@@ -3,7 +3,7 @@
         <nav class="uppercase fixed top-0 bg-white z-30 w-screen shadow-line flex justify-center">
             <div class="max-w-screen-xl w-screen mx-2 pl-4 pr-3 sm:pr-8 items-center h-28 flex justify-between">
                 <router-link to="/">
-                    <img class="w-24 -mt-2" :src="require(`@/assets/svg/logo.svg`)" alt="">
+                    <img class="w-24 h-auto -mt-1" :src="require(`@/assets/svg/logo.svg`)" alt="">
                 </router-link>
 
                 <div v-if="!user" class="text-xs items-center lg:visible lg:flex lg:static absolute invisible">

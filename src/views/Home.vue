@@ -2,17 +2,18 @@
     <!-- Баннер -->
     <transition appear enter-active-class="transform duration-1000 ease-out" enter-from-class="opacity-0">
         <div class="z-10 w-full relative flex items-center">
-            <img class="object-cover w-full h-128 sm:h-160" :src="require(`@/assets/images/banner3.jpg`)" alt="">
+            <img @load="bannerLoaded = true" class="object-cover w-full h-160 sm:h-160 absolute" :src="require(`@/assets/images/banner.jpg`)" alt="">
+            <div :class="{'opacity-20' : !bannerLoaded}" class="w-full h-160 sm:h-160 bg-black opacity-10"></div>
 
             <div class="w-full absolute flex justify-center">
                 <div class="max-w-screen-xl">
                     <div class="px-6 w-full pt-8 flex flex-col items-center">
-                        <h1 class="font-display text-center text-white uppercase font-black lg:-ml-1.5 leading-snug text-3xl sm:text-6xl">
+                        <h1 class="font-display drop-shadow-md text-center text-white uppercase font-black lg:-ml-1.5 leading-tight md:leading-tight text-5xl xl:text-6xl">
                             Доставка цветов в Челябинске
                         </h1>
 
                         <div class="mt-6 mb-4">
-                            <svg width="80" height="54" viewBox="0 0 43 27" class="fill-white"
+                            <svg width="80" height="54" viewBox="0 0 43 27" class="fill-white drop-shadow-md"
                                  xmlns="http://www.w3.org/2000/svg">
                                 <path class="fill-white" fill-rule="evenodd" clip-rule="evenodd"
                                       d="M30.3854 12.8158C30.3981 12.7197 30.3306 12.6315 30.2346 12.6188C25.4653 11.9851 12.8194 11.427 0.326099 14.2559C0.231606 14.2773 0.172348 14.3712 0.193744 14.4657C0.215141 14.5602 0.309089 14.6195 0.403582 14.5981C12.8476 11.7803 25.4504 12.337 30.1884 12.9666C30.2844 12.9793 30.3726 12.9118 30.3854 12.8158Z"
@@ -32,9 +33,12 @@
                             </svg>
                         </div>
 
-                        <div class="lg:text-md sm:w-1/2 w-2/3 text-center font-serif leading-relaxed text-white">
-                            Мы знаем, что дарить так же приятно, как и получать.
+                        <div class="relative sm:w-2/3 flex justify-center drop-shadow-md">
+                            <div class="lg:text-2xl px-6 py-1 w-fit text-xl text-center font-serif leading-relaxed text-white drop-shadow-3xl">
+                                Мы знаем, что дарить так же приятно, как и получать
+                            </div>
                         </div>
+
 
                         <router-link
                                 :to="{name: 'Home', params: { hash: '#bouquets' }}"
@@ -97,25 +101,25 @@
                 </div>
 
                 <div class="sm:flex">
-                    <div class="sm:w-1/3 font-bold font-display text-6xl -ml-1.5 mb-6 -mt-2 text-mainRed">Кто мы?</div>
+                    <div class="sm:w-1/3 font-bold font-display text-6xl -ml-1.5 mb-9 -mt-2 text-mainRed">Кто мы?</div>
 
-                    <div class="sm:w-2/3 font-serif text-gray-500 sm:text-xl">
-                        <div class="leading-loose">
-                            <span class="font-bold">Florets </span>(/ ˈflɒrɪts / - ударение на “о”) - это красиво, идеально рассчитано по времени и доставлено с учетом каждой мелочи. Мы поможем вам поделиться чем-то реальным с людьми, которые вам небезразличны. Наши флористы гарантируют, что всякий раз, заказывая букет у Florets, вы и ваши близкие получете созданный с любовью праздник естественной красоты.
+                    <div class="sm:w-2/3 font-serif text-gray-500 text-lg lg:text-xl">
+                        <div class="sm:leading-loose leading-9">
+                            <span class="font-bold">Florets </span>(/ˈflɒrɪts / - ударение на “о”) - это красиво, идеально рассчитано по времени и доставлено с учетом каждой мелочи. Мы поможем вам поделиться чем-то реальным с людьми, которые вам небезразличны. Наши флористы гарантируют, что всякий раз, заказывая букет у Florets, вы и ваши близкие получете созданный с любовью праздник естественной красоты.
                         </div>
 
-                        <ul class="leading-loose mt-9">
-                            <li class="mt-3">
+                        <ul class="sm:leading-loose leading-9 mt-9">
+                            <li class="mt-6 sm:mt-3">
                                 <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-60 absolute"></span>
                                 <span class="sm:ml-0 ml-4">Мы гарантируем, что все наши цветы будут свежими не менее трех дней.</span>
                             </li>
 
-                            <li class="mt-3">
+                            <li class="mt-6 sm:mt-3">
                                 <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-60 absolute"></span>
                                 <span class="sm:ml-0 ml-4">Каждый букет создается опытным флористом.</span>
                             </li>
 
-                            <li class="mt-3">
+                            <li class="mt-6 sm:mt-3">
                                 <span class="sm:-ml-5 sm:mt-4.5 mt-3.5 w-1.5 h-1.5 rounded-full bg-mainRed opacity-60 absolute"></span>
                                 <span class="sm:ml-0 ml-4">Бесплатная доставка в любую точку города Челябинска.</span>
                             </li>
@@ -139,6 +143,7 @@ import { onMounted, ref } from "vue";
 import axios from 'axios'
 
 const products = ref([])
+const bannerLoaded = ref(false)
 
 const nextPage = async () => {
     if (products.value.next_page_url) {
@@ -172,4 +177,8 @@ onMounted(async () => {
 const index = ref(products)
 </script>
 <style>
+::selection {
+    color: white;
+    background: #FE344C;
+}
 </style>

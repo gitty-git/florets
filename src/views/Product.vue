@@ -13,32 +13,38 @@
 
                 <div class="flex lg:flex-row flex-col">
                     <div class="lg:w-1/2 max-w-xl mb-12 sm:flex-row flex-col flex justify-between">
-                        <div class="relative mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3">
-                            <img v-show="!mainImageLoaded" class="w-full" :src="require(`@/assets/images/plug.png`)"
-                                 alt="">
-                            <transition appear enter-active-class="-transition transform duration-500 ease-out"
+                        <div class="relative mb-6 sm:mb-0 object-cover w-full sm:w-4/5 sm:pr-3 relative">
+                            <img class="w-full" :src="require(`@/assets/images/plug.png`)" alt="">
+                            <transition type="out-in" enter-active-class="transition transform duration-700"
                                         enter-from-class="opacity-0">
                                 <img v-if="product" v-show="mainImageLoaded"
-                                     @load="mainImageLoaded = true" class="top-0 left-0 w-full" :src="mainImage" alt="">
+                                     @load="mainImageLoaded = true" class="absolute top-0 h-full w-fit" :src="mainImage" alt="">
                             </transition>
                         </div>
 
-                        <div class="sm:w-1/6 sm:flex sm:flex-col grid grid-cols-4 gap-x-6 items-stretch justify-between">
-                            <div v-show="!loaded" v-for="hi in 4">
+                        <div v-show="!product" class="sm:w-1/6 sm:flex sm:flex-col grid grid-cols-4 gap-x-6 items-stretch justify-between">
+                            <div v-for="key in 4">
                                 <img class="w-full" :src="require(`@/assets/images/plug.png`)" alt="">
                             </div>
+                        </div>
 
-                            <div v-if="product" v-for="(image, key) in images" :key="key">
-                                <transition appear enter-active-class="-transition transform duration-500 ease-out"
-                                            enter-from-class="opacity-0">
-                                    <img @load="loaded = true" v-show="loaded"
-                                         class="sm:mr-0 hover:scale-105 cursor-pointer duration-150"
-                                         :src="image" alt="" @click="mainImage = image">
-                                </transition>
+                        <div v-if="product" class="sm:w-1/6 sm:flex sm:flex-col grid grid-cols-4 gap-x-6 items-stretch justify-between">
+                            <div v-for="(image, key) in images" :key="key">
+                                <div class="relative">
+                                    <img class="w-full" :src="require(`@/assets/images/plug.png`)" alt="">
+                                    <transition type="out-in" enter-active-class="transition transform duration-1000"
+                                                enter-from-class="opacity-0">
+                                        <img @load="loaded = true" v-show="loaded"
+                                             class="sm:mr-0 hover:scale-105 cursor-pointer duration-150 absolute top-0"
+                                             :src="image" alt="" @click="mainImage = image">
+                                    </transition>
+                                </div>
                             </div>
                         </div>
                     </div>
 
+                    <transition type="out-in" enter-active-class="transition transform duration-200"
+                                enter-from-class="opacity-0">
                     <div v-if="product" class="lg:pl-20 w-full lg:w-1/2">
                         <div>
                             <div class="flex flex-wrap mb-2">
@@ -109,11 +115,12 @@
                             <span class="text-black font-medium">ID продукта:</span> {{ product.id.toUpperCase() }}
                         </div>
                     </div>
+                    </transition>
                 </div>
             </div>
 
-            <transition appear enter-active-class="-transition delay-500 transform duration-500 ease-out"
-                        enter-from-class="translate-y-full opacity-0">
+            <transition appear enter-active-class="delay-700 transform duration-1000 ease-out"
+                        enter-from-class="opacity-0">
                 <div class="w-full">
                     <Footer/>
                 </div>

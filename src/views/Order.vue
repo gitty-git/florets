@@ -28,7 +28,7 @@
                     <label class="text-sm">Улица, дом:</label>
                     <div @click="handleAddressInput" @focusout="handleAddressInput" @keyup="handleAddressInput"
                          @input="handleAddressInput">
-                        <input v-model="form.address" id="inputAddress" ref="addressInput" class="input" type="text">
+                        <input @click="getYmaps" v-model="form.address" id="inputAddress" ref="addressInput" class="input" type="text">
                     </div>
 
                     <div v-if="error.address" class="text-xs text-mainRed mt-1 absolute">{{ error.address }}</div>
@@ -48,7 +48,7 @@
                 <transition appear enter-active-class="transition transform duration-500 ease-out"
                             enter-from-class="translate-y-full opacity-0">
                     <div v-if="dates.length" class="flex flex-col justify-center items-center mt-12">
-                        <div class="w-full pr-12 text-sm">Выберете желаемую дату доставки:</div>
+                        <div class="w-full pr-12 text-sm">Выберите желаемую дату доставки:</div>
 
                         <div class="grid grid-cols-7 gap-6 w-full mt-6">
                             <div v-for="day in weekdays" class="text-xs text-gray-400 flex justify-center items-center">
@@ -120,7 +120,12 @@
                             enter-from-class="translate-y-full opacity-0">
                     <!-- submit -->
                     <div v-if="!submitHidden" class="w-full flex mt-16 justify-center">
-                        <div @click="handleSubmit" class="btn">
+                        <div v-show="loading" class="py-6">
+                            <svg class="animate-spin" width="24" height="24" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                <path d="M8 16C6.41775 16 4.87103 15.5308 3.55544 14.6518C2.23984 13.7727 1.21446 12.5233 0.608964 11.0615C0.00346254 9.59966 -0.154964 7.99112 0.153718 6.43928C0.4624 4.88743 1.22433 3.46197 2.34315 2.34315C3.46197 1.22433 4.88743 0.462399 6.43928 0.153718C7.99113 -0.154964 9.59966 0.00346288 11.0615 0.608964C12.5233 1.21447 13.7727 2.23985 14.6518 3.55544C15.5308 4.87103 16 6.41775 16 8L14.2821 8C14.2821 6.75751 13.9137 5.54293 13.2234 4.50983C12.5331 3.47674 11.552 2.67154 10.4041 2.19606C9.25616 1.72058 7.99303 1.59618 6.77442 1.83857C5.5558 2.08097 4.43643 2.67929 3.55786 3.55786C2.67929 4.43643 2.08097 5.5558 1.83858 6.77442C1.59618 7.99303 1.72058 9.25616 2.19606 10.4041C2.67154 11.552 3.47674 12.5331 4.50983 13.2234C5.54292 13.9137 6.75751 14.2821 8 14.2821L8 16Z" fill="#747474"/>
+                            </svg>
+                        </div>
+                        <div @click="handleSubmit" v-show="!loading" class="btn">
                             Подтвердить
                         </div>
                     </div>
@@ -155,10 +160,7 @@ const notice = ref('')
 const dates = ref([])
 const timePeriods = ref([])
 const availableHoursHidden = ref(true)
-const workingTime = { start: '09:00', end: '23:59' }
 const workingHours = ref(null)
-const startHour = +workingTime.start.split(':')[0]
-const endHour = +workingTime.end.split(':')[0]
 const form = ref({
     name: '',
     phone: '+7 ',
@@ -179,16 +181,23 @@ const error = ref({})
 const addressInput = ref(null)
 const yMap = ref(null)
 const expiredTimeErr = ref(null)
+const loading = ref(false)
+const currentDate = ref(null)
 
 let pickedDate = null
 
 const router = useRouter()
 
-const phoneRegularExp = /(\+7|8)[\s(]?(\d{3})[\s)]?(\d{3})[\s-]?(\d{2})[\s-]?(\d{2})/g;
-
 const pluralizedGoods = computed(() => {
     return pluralize(itemsInCart.value.amount)
 })
+
+const getYmaps = () => {
+    let obj = document.getElementsByTagName('ymaps')[0]
+    obj.addEventListener("click", () => {
+        addressInput.value.blur()
+    })
+}
 
 const nameInput = () => {
     if (form.value.name.length) {
@@ -229,9 +238,8 @@ const handlePayment = (payment) => {
 const setDates = () => {
     let opens = new Date(workingHours.value.opens_at)
     let closes = new Date(workingHours.value.closes_at)
-    let currDate = new Date
-    let firstDateNum = currDate.getDate() - currDate.getDay() + -6
-    let firstDay = new Date()
+    let firstDateNum = currentDate.value.getDate() - currentDate.value.getDay() + -6
+    let firstDay = new Date(currentDate.value)
     firstDay.setDate(firstDateNum)
 
     for (let i = 0; i < 21; i++) {
@@ -242,36 +250,32 @@ const setDates = () => {
         let closeDate = new Date(firstDay.getTime() + 86400000 * i)
         closeDate.setHours(closes.getHours())
         closeDate.setMinutes(closes.getMinutes())
-
-        let available = closeDate.getTime() > new Date().setHours(currDate.getHours() + 3)
-        // console.log(closeDate , '--',  new Date(new Date().setHours(currDate.getHours() + 3)), 'ava:',  available)
+        let available = closeDate.getTime() > new Date(currentDate.value).setHours(currentDate.value.getHours() + 3)
 
         dates.value.push({ date: new Date(firstDay.getTime() + 86400000 * i), available })
     }
 }
 
-const setAvailableHours = () => {
+const setAvailableHours = async () => {
+    await axios.get(`api/get-date`).then(res => {
+        currentDate.value = new Date(res.data)
+    })
     availableHours.value = []
     availableHoursHidden.value = false
 
-    let currDate = new Date()
     let opens = new Date(workingHours.value.opens_at)
     let closes = new Date(workingHours.value.closes_at)
     let hours
     let availableHour
 
     if (pickedDate < closes) {
-        availableHour = new Date().getHours() + 1
-        hours = Math.ceil((closes - currDate) / 60 / 60 / 1000) - 1
+        availableHour = currentDate.value.getHours() + 1
+        hours = Math.ceil((closes - currentDate.value) / 60 / 60 / 1000) - 1
     }
     else {
         availableHour = opens.getHours()
         hours = Math.ceil((closes - opens) / 60 / 60 / 1000)
     }
-
-    // console.log(opens.getHours(), "asdf", hours)
-
-    let datesHours
 
     for (let i = 1; i < hours - 1; i++) {
         let date = new Date(pickedDate.setHours(availableHour + i, 0, 0, 0))
@@ -292,14 +296,18 @@ const handleAddressInput = async () => {
     error.value.address = await checkAddress(form.value.address)
 }
 
-const checkIfChosenTimeHasExpired = (date) => {
+const checkIfChosenTimeHasExpired = async (date) => {
     const chosenDate = date
 
-    const chosenHourPlus = chosenDate.getHours() - 1
-    const datesAreTheSame = chosenDate.getDate() === new Date().getDate()
-    const currHour = new Date().getHours() + 1
+    await axios.get(`api/get-date`).then(res => {
+        currentDate.value = new Date(res.data)
+    })
 
-    return datesAreTheSame && chosenHourPlus < currHour
+    const chosenHourPlus = chosenDate.getHours() - 1
+    const datesAreTheSame = chosenDate.getDate() === currentDate.value.getDate()
+    const currHour = currentDate.value.getHours() + 1
+
+    return datesAreTheSame && currHour > chosenHourPlus
 }
 
 const checkAddress = async (address) => {
@@ -358,14 +366,15 @@ const handleSubmit = async () => {
         return
     }
 
-    if (checkIfChosenTimeHasExpired(form.value.delivery_time)) {
-        expiredTimeErr.value = 'Выбранный временной промежуток уже не достуступен.'
+    loading.value = true
+
+    if (await checkIfChosenTimeHasExpired(form.value.delivery_time)) {
+        expiredTimeErr.value = 'Выбранный временной промежуток более недостуступен.'
 
         form.value.delivery_time = pickedDate
         form.value.delivery_time.setHours(0, 0, 0, 0)
 
-        setAvailableHours()
-
+        await setAvailableHours()
         return
     }
 
@@ -382,7 +391,12 @@ const handleSubmit = async () => {
 
         store.dispatch('setCart', { amount: 0, price: 0 })
         localStorage.removeItem("cart")
+        loading.value = false
+    }).catch(err => {
+        loading.value = false
+        console.log(err)
     })
+
 }
 
 watchEffect(() => {
@@ -402,8 +416,14 @@ onBeforeMount(async () => {
         yMap.value = new ymaps.SuggestView('inputAddress')
     })
 
-    let res = await axios.get(`api/opening-hours`)
-    workingHours.value = res.data
+    await axios.get(`api/opening-hours`).then(res => {
+        workingHours.value = res.data
+    })
+
+
+    await axios.get(`api/get-date`).then(res => {
+        currentDate.value = new Date(res.data)
+    })
 
     setDates()
 })

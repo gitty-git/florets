@@ -17,7 +17,7 @@
             </div>
 
 
-            <div class="flex pt-12 flex-wrap" v-if="orders && computedOrders.length > 0">
+            <div class="flex pt-12 flex-wrap">
                 <div class="mr-6 text-gray-400 mb-4 text-sm uppercase cursor-pointer"
                      :class="{'text-mainRed underline' : activeCategory === status.eng }"
                      @click="fetchByStatus(status, id)"
@@ -49,9 +49,11 @@
                 </div>
             </div>
 
+            <div v-else class="mt-6 text-gray-400">Нет заказов...</div>
+
             <!-- pagination -->
-            <div v-if="orders && computedOrders.length > 0" class="flex justify-center items-center">
-                <div @click="prevPage"
+            <div v-if="orders && computedOrders.length > 0 && (orders.next_page_url || orders.prev_page_url)" class="flex justify-center items-center">
+                <div @click="prevPage" :class="{'opacity-25 hover:cursor-default hover:border-none': !orders.prev_page_url}"
                      class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
                     <img class="w-2" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                 </div>
@@ -60,21 +62,22 @@
                     {{ orders.current_page }}
                 </div>
 
-                <div @click="nextPage"
+                <div @click="nextPage" :class="{'opacity-25 hover:cursor-default hover:border-none': !orders.next_page_url}"
                      class="h-12 w-12 cursor-pointer duration-150 flex justify-center items-center hover:border-2 border-gray-150 rounded-full">
                     <img class="w-2 rotate-180" :src="require(`@/assets/svg/arrow.svg`)" alt="">
                 </div>
             </div>
 
-            <div v-else class="mt-12 text-gray-400">Нет заказов...</div>
-
             <OrderModal @modalHidden="showOrderModal" @order="updateOrders" :modalHidden="modalHidden"
                         v-if="!modalHidden" :orderId="orderId"/>
 
-            <!-- Footer -->
+
 
         </div>
-        <Footer/>
+        <!-- Footer -->
+        <transition appear enter-active-class="delay-500 transform duration-500 ease-out" enter-from-class="opacity-0">
+            <div class="w-full"><Footer/></div>
+        </transition>
     </div>
 </template>
 
